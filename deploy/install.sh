@@ -2,7 +2,7 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # Nuvsera Technology — one-command VPS installer (Ubuntu 22.04/24.04, Debian 12)
 #
-#   curl -fsSL https://raw.githubusercontent.com/rohitbaidya46/Nuvsera-Technology-Private-Limited/main/deploy/install.sh -o install.sh
+#   curl -fsSL https://raw.githubusercontent.com/rohitbaidya46/nuvsera-webside-/main/deploy/install.sh -o install.sh
 #   sudo bash install.sh
 #
 # Installs Docker, downloads the website, creates secure settings, starts:
@@ -12,7 +12,7 @@
 # ──────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-REPO_URL="${REPO_URL:-https://github.com/rohitbaidya46/Nuvsera-Technology-Private-Limited.git}"
+REPO_URL="${REPO_URL:-https://github.com/rohitbaidya46/nuvsera-webside-.git}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/nuvsera}"
 GREEN=$'\e[32m'; YELLOW=$'\e[33m'; RED=$'\e[31m'; BOLD=$'\e[1m'; RESET=$'\e[0m'
 step() { echo; echo "${BOLD}▶ $*${RESET}"; }
@@ -78,7 +78,7 @@ else
     die "Could not download $REPO_URL.
    If the GitHub repository is private, create a token (GitHub → Settings → Developer settings →
    Fine-grained tokens → read-only 'Contents' access to this repository) and run:
-   REPO_URL=https://<TOKEN>@github.com/rohitbaidya46/Nuvsera-Technology-Private-Limited.git sudo -E bash install.sh"
+   REPO_URL=https://<TOKEN>@github.com/rohitbaidya46/nuvsera-webside-.git sudo -E bash install.sh"
   fi
 fi
 cd "$INSTALL_DIR"

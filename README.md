@@ -154,19 +154,22 @@ Notes:
 Needs a VPS with at least 1 vCPU, 2 GB RAM and 20 GB disk. The installer adds swap automatically on small servers.
 
 1. At your domain registrar, create **A records** pointing `@` and `www` to the VPS IP address.
-2. Log in to the VPS as root (or a sudo user) and run:
+2. Create a read-only GitHub token: GitHub → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**. Set *Repository access* to **Only select repositories → nuvsera-webside-**, and *Permissions → Contents* to **Read-only**.
+3. Log in to the VPS as root and run (replace `YOUR_TOKEN`):
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/rohitbaidya46/Nuvsera-Technology-Private-Limited/main/deploy/install.sh -o install.sh && sudo bash install.sh
+   git clone https://YOUR_TOKEN@github.com/rohitbaidya46/nuvsera-webside-.git /opt/nuvsera && bash /opt/nuvsera/deploy/install.sh
    ```
 
-3. Answer two questions: your domain, and the admin email. About 10 minutes later the installer prints the website address, the admin address and a **temporary admin password**.
+   If the repository is public, `git clone https://github.com/rohitbaidya46/nuvsera-webside-.git /opt/nuvsera` works without a token.
+
+4. Answer two questions: your domain, and the admin email. About 10 minutes later the installer prints the website address, the admin address and a **temporary admin password**.
 
 It installs Docker, the website, PostgreSQL, **Caddy** (automatic HTTPS certificates and renewal, www → main domain redirect), scheduled jobs, nightly database dumps in `/opt/nuvsera/backups`, and a firewall that allows only SSH, HTTP and HTTPS. All secrets are generated on the server and stored in `/opt/nuvsera/.env` (root-only).
 
 - **Update** after new code is pushed to GitHub: `sudo bash /opt/nuvsera/deploy/update.sh`. It takes a database backup first.
 - **Logs:** `cd /opt/nuvsera && sudo docker compose logs -f app`
-- **Private repository:** pass a read-only GitHub token through `REPO_URL`; the installer explains how if the download fails.
+- **Token:** it is stored in `/opt/nuvsera/.git/config` so `update.sh` can pull new code. It is read-only and limited to this repository; revoke it in GitHub at any time.
 - **Email and captcha:** set SMTP in Admin → Site settings. For hCaptcha, add the keys to `.env` and run `update.sh`.
 
 ## 4. Deploying to AWS (or any VM) with Docker (manual)
