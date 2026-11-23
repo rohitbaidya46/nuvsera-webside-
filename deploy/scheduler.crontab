@@ -1,3 +1,4 @@
 # Scheduled jobs for the self-hosted stack (times in UTC). CRON_SECRET comes from .env.
-*/15 * * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" http://app:3000/api/cron/reminders > /dev/null
-0 21 * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" http://app:3000/api/cron/backup > /dev/null
+# Uses busybox wget (built into Alpine) so the scheduler needs no package downloads.
+*/15 * * * * wget -q -O /dev/null --header "Authorization: Bearer $CRON_SECRET" http://app:3000/api/cron/reminders
+0 21 * * * wget -q -O /dev/null --header "Authorization: Bearer $CRON_SECRET" http://app:3000/api/cron/backup

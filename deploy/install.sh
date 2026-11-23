@@ -85,9 +85,7 @@ cd "$INSTALL_DIR"
 ok "Code in $INSTALL_DIR ($(git rev-parse --short HEAD))"
 
 # ── 4. Settings (.env) with fresh secrets ──
-FIRST_INSTALL=0
 if [ ! -f .env ]; then
-  FIRST_INSTALL=1
   step "Creating secure settings"
   ADMIN_PASSWORD="Nv-$(openssl rand -base64 18 | tr -dc 'A-Za-z0-9' | head -c 16)!7a"
   cat > .env <<EOF
@@ -168,10 +166,13 @@ echo "${GREEN}${BOLD}  Nuvsera Technology website is installed${RESET}"
 echo "${GREEN}${BOLD}══════════════════════════════════════════════════════════${RESET}"
 echo "  Website:      https://$DOMAIN"
 echo "  Admin panel:  https://$DOMAIN/admin"
-if [ "$FIRST_INSTALL" = 1 ]; then
-  echo "  Admin email:  $ADMIN_EMAIL"
-  echo "  Temporary password:  ${BOLD}$ADMIN_PASSWORD${RESET}"
-  echo "  → On first sign-in you'll set up 2FA and choose a new password."
+SEED_EMAIL="$(grep -E '^SEED_ADMIN_EMAIL=' .env | cut -d= -f2-)"
+SEED_PASS="$(grep -E '^SEED_ADMIN_PASSWORD=' .env | cut -d= -f2-)"
+if [ -n "$SEED_PASS" ]; then
+  echo "  Admin email:  $SEED_EMAIL"
+  echo "  Temporary password:  ${BOLD}$SEED_PASS${RESET}"
+  echo "  → On first sign-in you'll set up 2FA and must choose a new password."
+  echo "    (Already signed in before? Ignore this — your own password is unchanged.)"
 fi
 echo
 echo "  Code & settings:  $INSTALL_DIR   (settings: $INSTALL_DIR/.env — back up ENCRYPTION_KEY)"

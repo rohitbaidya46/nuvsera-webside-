@@ -149,7 +149,27 @@ Notes:
 - **Scheduled jobs** (`vercel.json`): encrypted backup daily at 02:30 IST, and follow-up reminder emails daily at 09:00 IST. The free Hobby plan allows only daily jobs; on Pro you can change reminders to every 15 minutes (`*/15 * * * *`).
 - `APP_URL` defaults to the Vercel production address when not set.
 
-## 4. Deploying to AWS (or any VM) with Docker
+## 4a. Deploying to your own VPS: one command (Ubuntu 22.04/24.04 or Debian 12)
+
+Needs a VPS with at least 1 vCPU, 2 GB RAM and 20 GB disk. The installer adds swap automatically on small servers.
+
+1. At your domain registrar, create **A records** pointing `@` and `www` to the VPS IP address.
+2. Log in to the VPS as root (or a sudo user) and run:
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/rohitbaidya46/Nuvsera-Technology-Private-Limited/main/deploy/install.sh -o install.sh && sudo bash install.sh
+   ```
+
+3. Answer two questions: your domain, and the admin email. About 10 minutes later the installer prints the website address, the admin address and a **temporary admin password**.
+
+It installs Docker, the website, PostgreSQL, **Caddy** (automatic HTTPS certificates and renewal, www → main domain redirect), scheduled jobs, nightly database dumps in `/opt/nuvsera/backups`, and a firewall that allows only SSH, HTTP and HTTPS. All secrets are generated on the server and stored in `/opt/nuvsera/.env` (root-only).
+
+- **Update** after new code is pushed to GitHub: `sudo bash /opt/nuvsera/deploy/update.sh`. It takes a database backup first.
+- **Logs:** `cd /opt/nuvsera && sudo docker compose logs -f app`
+- **Private repository:** pass a read-only GitHub token through `REPO_URL`; the installer explains how if the download fails.
+- **Email and captcha:** set SMTP in Admin → Site settings. For hCaptcha, add the keys to `.env` and run `update.sh`.
+
+## 4. Deploying to AWS (or any VM) with Docker (manual)
 
 ```bash
 cp .env.example .env
