@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   serverExternalPackages: ["sharp", "exceljs"],
+  // exceljs pulls in packages that Node 22 loads via the "module-sync" export condition, which Next's
+  // file tracer does not follow. Without this, standalone/Vercel builds crash on CSV/Excel export.
+  outputFileTracingIncludes: {
+    "/api/admin/**": ["./node_modules/generator-function/**/*", "./node_modules/async-function/**/*"],
+  },
   async headers() {
     // CSP and the main security headers are set per request in src/middleware.ts.
     return [
