@@ -4,7 +4,7 @@ Run through this list on **staging** and again on **production** after go-live. 
 
 ## A. Automated smoke test
 
-Runs about 55 checks against a running instance: every public page, form validation, file-signature checks, honeypot, CSRF, 2FA login, role restrictions, content CRUD, CSV/Excel export, lockout and logout.
+Runs about 58 checks against a running instance: every public page, form validation, file-signature checks, honeypot, CSRF, 2FA login, role restrictions, content CRUD, CSV/Excel export, lockout and logout.
 
 ```bash
 BASE_URL=https://staging.nuvseratechnology.com ADMIN_EMAIL=… ADMIN_PASSWORD=… ADMIN_TOTP_SECRET=… npm run test:smoke

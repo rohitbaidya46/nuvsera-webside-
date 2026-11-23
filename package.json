@@ -16,7 +16,8 @@
     "create-admin": "tsx scripts/create-admin.ts",
     "backup": "tsx scripts/backup.ts",
     "backup:decrypt": "tsx scripts/decrypt-backup.ts",
-    "test:smoke": "tsx tests/smoke.ts"
+    "test:smoke": "tsx tests/smoke.ts",
+    "vercel-build": "prisma generate && prisma migrate deploy && tsx prisma/seed.ts && next build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

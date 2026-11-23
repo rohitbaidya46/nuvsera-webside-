@@ -5,6 +5,7 @@
  * If ADMIN_TOTP_SECRET is omitted and the account has not enrolled, the test enrols 2FA and prints the secret.
  * Creates test records prefixed "[SMOKE]" and removes them at the end.
  */
+import sharp from "sharp";
 import { generateTotp } from "../src/lib/totp";
 
 const BASE = (process.env.BASE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -151,6 +152,24 @@ async function main() {
   ok(exp.status === 200 && csv.includes("[SMOKE] Test Lead") && csv.includes("paid:linkedin"), "CSV export contains lead with derived source");
   const xlsx = await admin.req("/api/admin/leads/export?format=xlsx&q=SMOKE");
   ok(xlsx.status === 200 && (xlsx.headers.get("content-type") || "").includes("spreadsheetml"), "Excel export works");
+
+  // Media library: upload a PNG, expect WebP conversion and a public URL that serves it
+  const png = await sharp({ create: { width: 64, height: 32, channels: 3, background: "#E3A93B" } }).png().toBuffer();
+  const broken = new FormData();
+  broken.set("file", new File([new Uint8Array(png.subarray(0, 60))], "broken.png", { type: "image/png" }));
+  const br = await admin.json("/api/admin/media", { method: "POST", body: broken });
+  ok(br.status === 422, "Damaged image is rejected with a clear message");
+  const mfd = new FormData();
+  mfd.set("file", new File([new Uint8Array(png)], "smoke.png", { type: "image/png" }));
+  mfd.set("alt", "[SMOKE] test image");
+  const up = await admin.json("/api/admin/media", { method: "POST", body: mfd });
+  const item = up.body.item as { id: string; url: string } | undefined;
+  ok(up.status === 200 && item?.url.endsWith(".webp"), "Media upload converts image to WebP");
+  if (item) {
+    const img = await pub.req(item.url);
+    ok(img.status === 200 && img.headers.get("content-type") === "image/webp", "Uploaded image is served publicly");
+    await admin.json(`/api/admin/media/${item.id}`, { method: "DELETE" });
+  }
 
   // Role restriction: create a Content Editor and check they cannot read leads
   const editorEmail = `smoke-editor-${Date.now()}@example.com`;

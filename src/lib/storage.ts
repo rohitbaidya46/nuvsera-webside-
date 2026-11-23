@@ -1,13 +1,15 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { prisma } from "./db";
 import { env } from "./env";
 
 /**
  * Storage abstraction. Keys are prefixed:
  *   public/…   – served by /media/[...key] (images)
  *   private/…  – only via authenticated admin download routes (CVs, attachments, backups)
- * Driver "local" writes to UPLOAD_DIR (mount a volume in Docker); driver "s3" writes to an S3 bucket.
+ * Driver "local" writes to UPLOAD_DIR (mount a volume in Docker); driver "s3" writes to an S3 bucket;
+ * driver "database" stores files in PostgreSQL (simplest on Vercel — fine for a corporate site's volume).
  */
 const LOCAL_ROOT = path.resolve(process.env.UPLOAD_DIR || "./uploads");
 
@@ -30,6 +32,12 @@ function safeLocalPath(key: string) {
 }
 
 export async function putObject(key: string, body: Buffer, contentType: string) {
+  if (env.storageDriver === "database") {
+    if (!/^(public|private)\/[A-Za-z0-9/_.-]+$/.test(key)) throw new Error("Invalid storage key");
+    const data = new Uint8Array(body);
+    await prisma.storedFile.upsert({ where: { key }, create: { key, data, contentType, size: body.length }, update: { data, contentType, size: body.length } });
+    return;
+  }
   if (env.storageDriver === "s3") {
     await client().send(
       new PutObjectCommand({ Bucket: bucket(), Key: key, Body: body, ContentType: contentType, ServerSideEncryption: "AES256" }),
@@ -43,6 +51,10 @@ export async function putObject(key: string, body: Buffer, contentType: string) 
 
 export async function getObject(key: string): Promise<Buffer | null> {
   try {
+    if (env.storageDriver === "database") {
+      const f = await prisma.storedFile.findUnique({ where: { key } });
+      return f ? Buffer.from(f.data) : null;
+    }
     if (env.storageDriver === "s3") {
       const res = await client().send(new GetObjectCommand({ Bucket: bucket(), Key: key }));
       const bytes = await res.Body?.transformToByteArray();
@@ -56,7 +68,8 @@ export async function getObject(key: string): Promise<Buffer | null> {
 
 export async function deleteObject(key: string) {
   try {
-    if (env.storageDriver === "s3") await client().send(new DeleteObjectCommand({ Bucket: bucket(), Key: key }));
+    if (env.storageDriver === "database") await prisma.storedFile.deleteMany({ where: { key } });
+    else if (env.storageDriver === "s3") await client().send(new DeleteObjectCommand({ Bucket: bucket(), Key: key }));
     else await fs.unlink(safeLocalPath(key));
   } catch {
     /* already gone */

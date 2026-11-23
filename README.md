@@ -122,24 +122,32 @@ Legal review: the Privacy Policy, Terms & Conditions (payment and delivery polic
 
 ---
 
-## 3. Deploying to Vercel
+## 3. Deploying to Vercel (code on GitHub, automatic deploys)
 
-1. Push the repository to the company Git organisation and import it into a Vercel **Team** owned by the company.
-2. Create a managed PostgreSQL database and an S3 bucket. Vercel has no persistent disk, so use `STORAGE_DRIVER=s3`.
-3. In *Project → Settings → Environment Variables*, add everything from `.env.example`:
-   - `APP_URL=https://nuvseratechnology.com`
-   - `SITE_INDEXABLE=true` in **Production only**. Preview deployments stay `noindex`.
-   - `STORAGE_DRIVER=s3`, `S3_BUCKET`, `S3_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (an IAM user limited to that bucket)
-   - `CRON_SECRET`. Vercel Cron sends it as a Bearer token.
-4. Set the **Build Command** to `npx prisma migrate deploy && npm run build`, so migrations run on every deploy.
-5. Deploy, then seed once from your machine with `DATABASE_URL` pointing at production:
+Every push to the `main` branch on GitHub redeploys the site automatically. No command line is needed.
 
-   ```bash
-   npm run db:seed
-   ```
+1. **Database:** create a free PostgreSQL project at **neon.tech** (region: AWS Asia Pacific, Mumbai or Singapore). Copy the connection string; use the *direct* (not "pooled") one.
+2. **Vercel:** sign in at **vercel.com** with GitHub → **Add New → Project** → import this repository. Leave the build settings at their defaults; the `vercel-build` script in `package.json` is picked up automatically.
+3. Before clicking **Deploy**, open **Environment Variables** and add:
 
-6. Add the domain in Vercel, point DNS at it, and confirm HTTPS works. HSTS is sent automatically in production.
-7. `vercel.json` sets up two crons: the daily encrypted backup at 02:30 IST, and follow-up reminders every 15 minutes. Every-15-minute crons need a Vercel Pro plan; on Hobby, change the reminders schedule to daily.
+   | Name | Value |
+   |---|---|
+   | `DATABASE_URL` | the Neon connection string |
+   | `APP_SECRET` | a random string of 48+ characters |
+   | `ENCRYPTION_KEY` | 64 hex characters (`openssl rand -hex 32`). **Back it up**: losing it makes 2FA enrolments and backups unreadable |
+   | `CRON_SECRET` | a random string |
+   | `SEED_ADMIN_EMAIL` | email address for the first admin login |
+   | `SEED_ADMIN_PASSWORD` | a temporary password; you must change it at first login |
+
+   Optional now, recommended before launch: `SITE_INDEXABLE=true` (Production only, once on the real domain), `NEXT_PUBLIC_HCAPTCHA_SITE_KEY` + `HCAPTCHA_SECRET`, and SMTP details (or set SMTP later in Admin → Site settings).
+4. Click **Deploy**. Each build automatically applies database migrations and seeds placeholder content plus the first admin (it never overwrites existing content).
+5. Open `https://<project>.vercel.app/admin`, sign in, set up 2FA and change the password.
+6. **Domain:** Project → **Settings → Domains** → add `nuvseratechnology.com` and `www.nuvseratechnology.com`, then add the DNS records Vercel shows at your domain registrar. HTTPS is issued automatically. Once the domain works, set `APP_URL=https://nuvseratechnology.com` and redeploy.
+
+Notes:
+- **Uploads** (CVs, attachments, images) are stored in the database on Vercel (`STORAGE_DRIVER=database`, the default there), so no extra storage account is needed. For high volumes, switch to S3 (`STORAGE_DRIVER=s3` + S3 variables).
+- **Scheduled jobs** (`vercel.json`): encrypted backup daily at 02:30 IST, and follow-up reminder emails daily at 09:00 IST. The free Hobby plan allows only daily jobs; on Pro you can change reminders to every 15 minutes (`*/15 * * * *`).
+- `APP_URL` defaults to the Vercel production address when not set.
 
 ## 4. Deploying to AWS (or any VM) with Docker
 

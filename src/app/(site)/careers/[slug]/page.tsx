@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/site/JsonLd";
 import { PageHero } from "@/components/site/PageHero";
 import { ApplicationForm } from "@/components/site/forms/ApplicationForm";
 import { getJob } from "@/lib/content";
+import { env } from "@/lib/env";
 import { buildMetadata } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 
@@ -48,7 +49,7 @@ export default async function JobPage({ params }: Props) {
           datePosted: j.createdAt.toISOString(),
           ...(j.closesAt ? { validThrough: j.closesAt.toISOString() } : {}),
           employmentType: j.employmentType.toUpperCase().replace(/[^A-Z]/g, "_"),
-          hiringOrganization: { "@type": "Organization", name: c.legalName, sameAs: process.env.APP_URL },
+          hiringOrganization: { "@type": "Organization", name: c.legalName, sameAs: env.appUrl },
           jobLocation: { "@type": "Place", address: { "@type": "PostalAddress", streetAddress: c.addressLine1, addressLocality: c.city, addressRegion: c.state, postalCode: c.postalCode, addressCountry: "IN" } },
         }}
       />

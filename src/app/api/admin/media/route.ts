@@ -30,11 +30,17 @@ export const POST = route(async (req: Request) => {
     throw new HttpError(422, "That file is not a supported image.");
   }
   if (!meta.format || !["jpeg", "png", "webp", "gif", "avif", "heif"].includes(meta.format)) throw new HttpError(422, "Use JPG, PNG, WebP or GIF images.");
-  const { data, info } = await sharp(input, { animated: meta.format === "gif" })
-    .rotate()
-    .resize({ width: 2000, height: 2000, fit: "inside", withoutEnlargement: true })
-    .webp({ quality: 82 })
-    .toBuffer({ resolveWithObject: true });
+  let converted;
+  try {
+    converted = await sharp(input, { animated: meta.format === "gif" })
+      .rotate()
+      .resize({ width: 2000, height: 2000, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer({ resolveWithObject: true });
+  } catch {
+    throw new HttpError(422, "This image appears to be damaged and could not be processed. Please try another file.");
+  }
+  const { data, info } = converted;
   const key = storageKey("public/media", "webp");
   await putObject(key, data, "image/webp");
   const item = await prisma.media.create({

@@ -7,7 +7,8 @@ function required(name: string): string {
 
 export const env = {
   get appUrl() {
-    return (process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "");
+    const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    return (process.env.APP_URL || (vercel ? `https://${vercel}` : "http://localhost:3000")).replace(/\/$/, "");
   },
   get appSecret() {
     const v = required("APP_SECRET");
@@ -29,7 +30,10 @@ export const env = {
   get hcaptchaSecret() {
     return process.env.HCAPTCHA_SECRET || "";
   },
-  get storageDriver(): "local" | "s3" {
-    return process.env.STORAGE_DRIVER === "s3" ? "s3" : "local";
+  /** "database" is the default on Vercel (no persistent disk, no extra account needed). */
+  get storageDriver(): "local" | "s3" | "database" {
+    const d = process.env.STORAGE_DRIVER;
+    if (d === "s3" || d === "local" || d === "database") return d;
+    return process.env.VERCEL ? "database" : "local";
   },
 };

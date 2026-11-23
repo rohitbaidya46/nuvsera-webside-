@@ -459,3 +459,12 @@ model Backup {
   error     String?
   createdAt DateTime @default(now())
 }
+
+// Used when STORAGE_DRIVER=database (default on Vercel): uploaded files stored in PostgreSQL.
+model StoredFile {
+  key         String   @id
+  data        Bytes
+  contentType String
+  size        Int
+  createdAt   DateTime @default(now())
+}
