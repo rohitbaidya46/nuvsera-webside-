@@ -152,7 +152,7 @@ DNS_OK=0
 if [ "$DOMAIN" != "localhost" ]; then
   step "Checking that $DOMAIN points to this server"
   SERVER_IP="$(curl -4 -fsS --max-time 8 https://api.ipify.org 2>/dev/null || true)"
-  DOMAIN_IP="$(getent ahostsv4 "$DOMAIN" 2>/dev/null | awk 'NR==1{print $1}')"
+  DOMAIN_IP="$(getent ahostsv4 "$DOMAIN" 2>/dev/null | awk 'NR==1{print $1}' || true)"
   if [ -n "$SERVER_IP" ] && [ "$SERVER_IP" = "$DOMAIN_IP" ]; then
     DNS_OK=1
     ok "$DOMAIN → $SERVER_IP"
