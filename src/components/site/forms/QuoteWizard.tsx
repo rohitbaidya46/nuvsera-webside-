@@ -235,11 +235,11 @@ export function QuoteWizard({ services, defaultService }: { services: Svc[]; def
             <ArrowLeft className="h-4 w-4" aria-hidden /> Back
           </button>
           {step < STEPS.length - 1 ? (
-            <button type="button" className="btn-navy" onClick={next}>
+            <button key="next" type="button" className="btn-navy" onClick={next}>
               Continue <ArrowRight className="h-4 w-4" aria-hidden />
             </button>
           ) : (
-            <button type="submit" className="btn-gold" disabled={pending}>
+            <button key="submit" type="submit" className="btn-gold" disabled={pending}>
               <Send className="h-4 w-4" aria-hidden /> {pending ? "Sending…" : "Request my quote"}
             </button>
           )}
