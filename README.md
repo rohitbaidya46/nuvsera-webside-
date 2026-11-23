@@ -20,6 +20,41 @@ It contains:
 
 ---
 
+## 0. Run it on your own computer (Windows, macOS or Linux) — easiest path
+
+1. Install **Node.js 22 LTS** from https://nodejs.org (accept the defaults).
+2. Install **PostgreSQL 16** from https://www.postgresql.org/download/ (on Windows use the EDB installer). During installation, **choose a password for the `postgres` user and write it down**. Keep the port as 5432.
+3. Unzip this project, open the folder, and open a terminal there (Windows: click the address bar of the folder window, type `cmd`, press Enter).
+4. Run these commands one at a time:
+
+   ```bash
+   npm ci
+   ```
+
+   ```bash
+   npm run setup
+   ```
+
+   (asks for the PostgreSQL password from step 2 and creates `.env` with new security keys)
+
+   ```bash
+   npm run db:migrate
+   ```
+
+   ```bash
+   npm run db:seed
+   ```
+
+   (**copy the temporary admin password it prints** — it is shown only once)
+
+   ```bash
+   npm run dev
+   ```
+
+5. Keep that terminal open and visit **http://localhost:3000** (website) and **http://localhost:3000/admin** (admin panel). On first admin sign-in, scan the QR code with an authenticator app on your phone and choose a new password.
+
+To stop the site press `Ctrl + C` in the terminal; to start it again later, run `npm run dev` in the same folder.
+
 ## 1. Quick start (local development)
 
 Requirements: Node.js 20.9+ (22 LTS recommended) and PostgreSQL 14+.

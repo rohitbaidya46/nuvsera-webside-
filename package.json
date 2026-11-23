@@ -4,6 +4,7 @@
   "private": true,
   "description": "Corporate website and admin panel for Nuvsera Technology Private Limited",
   "scripts": {
+    "setup": "node scripts/setup-env.mjs",
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
