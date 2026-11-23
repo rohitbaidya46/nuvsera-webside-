@@ -113,7 +113,7 @@ BASE_URL=https://staging.nuvseratechnology.com ADMIN_EMAIL=… ADMIN_PASSWORD=�
 
 | Check | Result |
 |---|---|
-| `npm run test:smoke` | 55 / 55 passed |
+| `npm run test:smoke` | 58 / 58 passed |
 | Lighthouse Home (mobile) | Perf 96 · A11y 100 · BP 100 · SEO 100 |
 | Lighthouse Service page (mobile) | Perf 98 · A11y 100 · BP 100 · SEO 100 |
 | Lighthouse Contact (mobile) | Perf 93 · A11y 100 · BP 100 · SEO 100 |
