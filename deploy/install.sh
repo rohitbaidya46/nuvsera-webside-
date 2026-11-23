@@ -233,7 +233,7 @@ NGINX
       die "nginx rejected the new site configuration, so it was removed again — your other sites are unchanged. Output of 'nginx -t':
 $(nginx -t 2>&1)"
     fi
-    systemctl reload nginx
+    systemctl reload nginx 2>/dev/null || nginx -s reload
     ok "nginx now serves $DOMAIN (existing sites unchanged)"
   fi
   get_cert nginx
@@ -261,7 +261,7 @@ APACHE
       a2dissite -q nuvsera >/dev/null; rm -f "$CONF"
       die "Apache rejected the new site configuration, so it was removed again — your other sites are unchanged."
     fi
-    systemctl reload apache2
+    systemctl reload apache2 2>/dev/null || apachectl graceful
     ok "Apache now serves $DOMAIN (existing sites unchanged)"
   fi
   get_cert apache
