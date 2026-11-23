@@ -57,7 +57,7 @@ To stop the site press `Ctrl + C` in the terminal; to start it again later, run 
 
 ## 1. Quick start (local development)
 
-Requirements: Node.js 20.9+ (22 LTS recommended) and PostgreSQL 14+.
+Requirements: Node.js 20.12+ (22 LTS recommended) and PostgreSQL 14+.
 
 ```bash
 npm ci

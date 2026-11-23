@@ -1,6 +1,12 @@
 /* eslint-disable no-console */
 // Seeds placeholder content only. Safe to re-run: existing records are not overwritten
 // (pass SEED_OVERWRITE=true to refresh services and pages from the seed files).
+// Load .env when run from the command line (existing environment variables take precedence).
+try {
+  process.loadEnvFile();
+} catch {
+  /* no .env file — rely on the environment */
+}
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "node:crypto";

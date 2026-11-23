@@ -1,6 +1,12 @@
 /* eslint-disable no-console */
 // Usage: npm run create-admin -- "Full Name" email@example.com SUPER_ADMIN
 // Creates a user and prints a one-time password-setup link (valid 48h).
+// Load .env when run from the command line (existing environment variables take precedence).
+try {
+  process.loadEnvFile();
+} catch {
+  /* no .env file — rely on the environment */
+}
 import { PrismaClient, type Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "node:crypto";

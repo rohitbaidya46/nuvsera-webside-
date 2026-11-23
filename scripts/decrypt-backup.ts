@@ -1,5 +1,11 @@
 /* eslint-disable no-console */
 // Usage: ENCRYPTION_KEY=... npm run backup:decrypt -- backup-....json.gz.enc  → writes backup-....json
+// Load .env when run from the command line (existing environment variables take precedence).
+try {
+  process.loadEnvFile();
+} catch {
+  /* no .env file — rely on the environment */
+}
 import { readFileSync, writeFileSync } from "node:fs";
 import { decryptBackup } from "../src/lib/backup";
 
