@@ -159,7 +159,11 @@ if [ "$DOMAIN" != "localhost" ]; then
   else
     warn "$DOMAIN points to '${DOMAIN_IP:-nothing}', but this server is '${SERVER_IP:-unknown}'."
     warn "At your domain registrar, create an A record:  @ → ${SERVER_IP:-<server IP>}   and   www → ${SERVER_IP:-<server IP>}"
-    warn "The site will start now; HTTPS activates automatically once DNS is correct (can take up to a few hours)."
+    if [ "${WEB_MODE:-caddy}" = caddy ]; then
+      warn "The site will start now; HTTPS activates automatically once DNS is correct (can take up to a few hours)."
+    else
+      warn "The site will start now; once DNS is correct, enable HTTPS with the command shown at the end."
+    fi
   fi
 fi
 

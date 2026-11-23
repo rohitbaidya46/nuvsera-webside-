@@ -165,7 +165,9 @@ Needs a VPS with at least 1 vCPU, 2 GB RAM and 20 GB disk. The installer adds sw
 
 4. Answer two questions: your domain, and the admin email. About 10 minutes later the installer prints the website address, the admin address and a **temporary admin password**.
 
-It installs Docker, the website, PostgreSQL, **Caddy** (automatic HTTPS certificates and renewal, www → main domain redirect), scheduled jobs, nightly database dumps in `/opt/nuvsera/backups`, and a firewall that allows only SSH, HTTP and HTTPS. All secrets are generated on the server and stored in `/opt/nuvsera/.env` (root-only).
+**Server already hosting another website?** The installer detects it and never disturbs it. With **nginx** or **Apache**, it adds `nuvseratechnology.com` as an extra site: the configuration is validated before reloading and rolled back automatically on any error, and a free Let's Encrypt certificate is requested for the new domain only. With any other web server, it leaves ports 80/443 alone and runs the site on a private port, printing the one remaining step. In these cases the firewall is not changed.
+
+On a dedicated server, it installs Docker, the website, PostgreSQL, **Caddy** (automatic HTTPS certificates and renewal, www → main domain redirect), scheduled jobs, nightly database dumps in `/opt/nuvsera/backups`, and a firewall that allows only SSH, HTTP and HTTPS. All secrets are generated on the server and stored in `/opt/nuvsera/.env` (root-only).
 
 - **Update** after new code is pushed to GitHub: `sudo bash /opt/nuvsera/deploy/update.sh`. It takes a database backup first.
 - **Logs:** `cd /opt/nuvsera && sudo docker compose logs -f app`
