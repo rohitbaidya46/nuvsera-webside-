@@ -1,0 +1,461 @@
+// Nuvsera Technology Private Limited — corporate website & admin panel
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Users & security ───────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  SALES
+  CONTENT_EDITOR
+}
+
+model User {
+  id                String    @id @default(cuid())
+  name              String
+  email             String    @unique
+  passwordHash      String
+  role              Role      @default(CONTENT_EDITOR)
+  isActive          Boolean   @default(true)
+  totpSecret        String?   // AES-256-GCM encrypted
+  totpEnabled       Boolean   @default(false)
+  recoveryCodes     String[]  // SHA-256 hashes of one-time recovery codes
+  failedLogins      Int       @default(0)
+  lockedUntil       DateTime?
+  passwordChangedAt DateTime  @default(now())
+  mustChangePassword Boolean  @default(false)
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  sessions       Session[]
+  resetTokens    PasswordResetToken[]
+  assignedLeads  Lead[]          @relation("LeadAssignee")
+  leadNotes      LeadNote[]
+  leadReminders  LeadReminder[]
+  leadEmails     LeadEmail[]
+  leadActivities LeadActivity[]
+  media          Media[]
+  auditLogs      AuditLog[]
+}
+
+model Session {
+  id                String   @id @default(cuid())
+  tokenHash         String   @unique
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  twoFactorVerified Boolean  @default(false)
+  ipAddress         String?
+  userAgent         String?
+  expiresAt         DateTime
+  lastSeenAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userEmail String?
+  action    String   // e.g. "lead.update", "auth.login.failed"
+  entity    String?
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
+
+model RateLimit {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+}
+
+// ─────────────────────────── Leads CRM ───────────────────────────
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+enum LeadType {
+  CONTACT
+  QUOTE
+}
+
+model Lead {
+  id             String     @id @default(cuid())
+  type           LeadType   @default(CONTACT)
+  name           String
+  company        String?
+  email          String
+  phone          String?
+  service        String?    // service slug
+  budget         String?
+  timeline       String?
+  message        String?
+  details        Json?      // extra quote-wizard answers
+  attachmentKey  String?
+  attachmentName String?
+  attachmentSize Int?
+  status         LeadStatus @default(NEW)
+  assignedToId   String?
+  assignedTo     User?      @relation("LeadAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  consent        Boolean    @default(false)
+  consentAt      DateTime?
+
+  // Attribution
+  source       String?  // derived channel: google-ads, linkedin-ads, organic, referral, direct, utm:<source>
+  sourcePage   String?
+  landingPage  String?
+  referrer     String?
+  utmSource    String?
+  utmMedium    String?
+  utmCampaign  String?
+  utmTerm      String?
+  utmContent   String?
+  gclid        String?
+  gbraid       String?
+  wbraid       String?
+  liFatId      String?
+  ipHash       String?
+  userAgent    String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  closedAt   DateTime?
+
+  notes      LeadNote[]
+  reminders  LeadReminder[]
+  emails     LeadEmail[]
+  activities LeadActivity[]
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([service])
+  @@index([source])
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model LeadReminder {
+  id         String    @id @default(cuid())
+  leadId     String
+  lead       Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  dueAt      DateTime
+  note       String?
+  done       Boolean   @default(false)
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([dueAt, done])
+}
+
+model LeadEmail {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  senderId  String?
+  sender    User?    @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  subject   String
+  body      String
+  status    String   @default("SENT") // SENT | FAILED
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+model LeadActivity {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      String   // created | status | assigned | note | email | reminder
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Subscriber {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  status           String    @default("ACTIVE") // ACTIVE | UNSUBSCRIBED
+  consent          Boolean   @default(true)
+  source           String?
+  unsubscribeToken String    @unique @default(cuid())
+  createdAt        DateTime  @default(now())
+  unsubscribedAt   DateTime?
+}
+
+model ConsentRecord {
+  id        String   @id @default(cuid())
+  consentId String   // anonymous browser identifier
+  necessary Boolean  @default(true)
+  analytics Boolean  @default(false)
+  marketing Boolean  @default(false)
+  action    String   // accept_all | reject_all | custom
+  version   String
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([consentId])
+}
+
+// ─────────────────────────── Content ───────────────────────────
+
+model Page {
+  id             String   @id @default(cuid())
+  slug           String   @unique // "home", "about", "privacy-policy" …
+  title          String
+  intro          String?
+  body           String?  // sanitised HTML
+  isSystem       Boolean  @default(false) // system pages: body is rendered by code, only SEO editable
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  canonicalUrl   String?
+  noindex        Boolean  @default(false)
+  updatedAt      DateTime @updatedAt
+  createdAt      DateTime @default(now())
+}
+
+model Service {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  shortDescription String
+  icon             String   @default("code")
+  overview         String   // sanitised HTML
+  deliverables     String[]
+  techStack        String[]
+  process          Json     // [{ title, description }]
+  faqs             Json     // [{ question, answer }]
+  featured         Boolean  @default(false)
+  published        Boolean  @default(true)
+  order            Int      @default(0)
+  seoTitle         String?
+  seoDescription   String?
+  ogImage          String?
+  canonicalUrl     String?
+  noindex          Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model CaseStudy {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  client         String?
+  industry       String?
+  summary        String
+  challenge      String?
+  solution       String?
+  results        String?
+  body           String?
+  services       String[] // service slugs
+  coverImage     String?
+  isPlaceholder  Boolean  @default(true)
+  published      Boolean  @default(false)
+  order          Int      @default(0)
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  canonicalUrl   String?
+  noindex        Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model BlogCategory {
+  id    String     @id @default(cuid())
+  name  String
+  slug  String     @unique
+  posts BlogPost[]
+}
+
+model BlogTag {
+  id    String     @id @default(cuid())
+  name  String
+  slug  String     @unique
+  posts BlogPost[]
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+}
+
+model BlogPost {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  excerpt        String
+  body           String
+  coverImage     String?
+  authorName     String?
+  status         PostStatus    @default(DRAFT)
+  publishedAt    DateTime?
+  categoryId     String?
+  category       BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags           BlogTag[]
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  canonicalUrl   String?
+  noindex        Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([status, publishedAt])
+}
+
+model TeamMember {
+  id            String   @id @default(cuid())
+  name          String
+  designation   String
+  bio           String?
+  photo         String?
+  linkedin      String?
+  isPlaceholder Boolean  @default(true)
+  published     Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Job {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  title          String
+  department     String
+  location       String           @default("Kolkata, West Bengal (On-site)")
+  employmentType String           @default("Full-time")
+  experience     String?
+  summary        String
+  description    String
+  published      Boolean          @default(false)
+  closesAt       DateTime?
+  order          Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  applications   JobApplication[]
+}
+
+model JobApplication {
+  id          String   @id @default(cuid())
+  jobId       String?
+  job         Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  name        String
+  email       String
+  phone       String
+  location    String?
+  experience  String?
+  linkedin    String?
+  portfolio   String?
+  coverLetter String?
+  cvKey       String
+  cvName      String
+  cvSize      Int
+  status      String   @default("NEW") // NEW | REVIEWING | SHORTLISTED | REJECTED | HIRED
+  consent     Boolean  @default(false)
+  ipHash      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id                String   @id @default(cuid())
+  name              String
+  designation       String?
+  company           String?
+  quote             String
+  rating            Int?
+  approved          Boolean  @default(false)
+  // Admin confirms written permission from the client to publish this testimonial.
+  permissionOnFile  Boolean  @default(false)
+  order             Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String   @default("general") // general | <service slug> | careers | ns-exchange
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  url          String
+  filename     String
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  alt          String   @default("")
+  uploadedById String?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model Backup {
+  id        String   @id @default(cuid())
+  key       String
+  size      Int
+  trigger   String   // cron | manual
+  status    String   // SUCCESS | FAILED
+  error     String?
+  createdAt DateTime @default(now())
+}

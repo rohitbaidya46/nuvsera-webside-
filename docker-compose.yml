@@ -1,0 +1,77 @@
+# Self-hosted stack: app + PostgreSQL + scheduled jobs + nightly pg_dump.
+#   1) cp .env.example .env   and fill in every value
+#   2) docker compose --profile tools run --rm migrate     (creates tables + seeds placeholder content)
+#   3) docker compose up -d --build
+# Put a TLS-terminating reverse proxy (Caddy, Nginx, AWS ALB) in front — production must be HTTPS-only.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nuvsera
+      POSTGRES_USER: nuvsera
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nuvsera"]
+      interval: 10s
+      retries: 5
+
+  migrate:
+    build: { context: ., target: tools }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://nuvsera:${POSTGRES_PASSWORD}@db:5432/nuvsera
+    depends_on:
+      db: { condition: service_healthy }
+    command: sh -c "npx prisma migrate deploy && npx tsx prisma/seed.ts"
+    profiles: ["tools"]
+
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_HCAPTCHA_SITE_KEY: ${NEXT_PUBLIC_HCAPTCHA_SITE_KEY:-}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://nuvsera:${POSTGRES_PASSWORD}@db:5432/nuvsera
+      UPLOAD_DIR: /data/uploads
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db: { condition: service_healthy }
+
+  # Calls the app's scheduled jobs: reminders every 15 min, encrypted app backup daily at 02:30 IST (21:00 UTC).
+  scheduler:
+    image: alpine:3.20
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./deploy/scheduler.crontab:/deploy/scheduler.crontab:ro
+    # busybox crond does not pass container env to jobs, so the secret is substituted at start-up.
+    command: sh -c 'apk add --no-cache curl >/dev/null && sed "s|\$$CRON_SECRET|$$CRON_SECRET|g" /deploy/scheduler.crontab > /etc/crontabs/root && crond -f -l 8'
+    depends_on: [app]
+
+  # Nightly PostgreSQL dump (database-level backup alongside the app backup). Retention handled by deploy/pg-backup.sh.
+  db-backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_KEEP_DAYS: "14"
+    volumes:
+      - ./backups:/backups
+      - ./deploy/pg-backup.sh:/usr/local/bin/pg-backup.sh:ro
+    entrypoint: sh -c "echo '0 21 * * * sh /usr/local/bin/pg-backup.sh' > /etc/crontabs/root && crond -f -l 8"
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  uploads:
