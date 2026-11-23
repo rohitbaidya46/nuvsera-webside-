@@ -1,0 +1,22 @@
+# Production add-on for a single VPS: Caddy web server with automatic HTTPS on ports 80/443.
+# Used together with docker-compose.yml (deploy/install.sh sets COMPOSE_FILE so plain `docker compose` uses both).
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [app]
+
+volumes:
+  caddy_data:
+  caddy_config:
