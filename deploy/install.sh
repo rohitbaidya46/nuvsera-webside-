@@ -209,11 +209,14 @@ if [ "$WEB_MODE" = nginx ]; then
   if [ ! -f "$CONF" ]; then
     OTHER="$(site_conflict /etc/nginx)"
     [ -n "$OTHER" ] && die "nginx already has a site for $DOMAIN in $OTHER — not changing it. Send this message to your developer."
+    # Listen on IPv6 only when the server has it AND existing sites already use it.
+    IPV6_LISTEN=""
+    if [ -e /proc/net/if_inet6 ] && grep -RqsE 'listen[[:space:]]+\[::\]' /etc/nginx; then IPV6_LISTEN="listen [::]:80;"; fi
     cat > "$CONF" <<NGINX
 # Nuvsera Technology website — added by deploy/install.sh
 server {
     listen 80;
-    listen [::]:80;
+    $IPV6_LISTEN
     server_name $DOMAIN www.$DOMAIN;
     client_max_body_size 12m;
     location / {
@@ -228,10 +231,10 @@ server {
 }
 NGINX
     [ "$CONF_DIR" = /etc/nginx/sites-available ] && ln -sf "$CONF" /etc/nginx/sites-enabled/nuvsera.conf
-    if ! nginx -t >/dev/null 2>&1; then
+    if ! NGINX_TEST="$(nginx -t 2>&1)"; then
       rm -f "$CONF" /etc/nginx/sites-enabled/nuvsera.conf
-      die "nginx rejected the new site configuration, so it was removed again — your other sites are unchanged. Output of 'nginx -t':
-$(nginx -t 2>&1)"
+      die "nginx rejected the new site configuration, so it was removed again — your other sites are unchanged. nginx said:
+$NGINX_TEST"
     fi
     systemctl reload nginx 2>/dev/null || nginx -s reload
     ok "nginx now serves $DOMAIN (existing sites unchanged)"
@@ -257,9 +260,10 @@ elif [ "$WEB_MODE" = apache ]; then
 </VirtualHost>
 APACHE
     a2ensite -q nuvsera >/dev/null
-    if ! apachectl configtest >/dev/null 2>&1; then
+    if ! APACHE_TEST="$(apachectl configtest 2>&1)"; then
       a2dissite -q nuvsera >/dev/null; rm -f "$CONF"
-      die "Apache rejected the new site configuration, so it was removed again — your other sites are unchanged."
+      die "Apache rejected the new site configuration, so it was removed again — your other sites are unchanged. Apache said:
+$APACHE_TEST"
     fi
     systemctl reload apache2 2>/dev/null || apachectl graceful
     ok "Apache now serves $DOMAIN (existing sites unchanged)"
