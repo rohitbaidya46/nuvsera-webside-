@@ -6,3 +6,5 @@ node_modules
 uploads
 backups
 docs
+brand
+scripts/render-*.mjs
