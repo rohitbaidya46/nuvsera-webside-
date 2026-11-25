@@ -49,11 +49,11 @@ export function Footer({ settings, services }: { settings: SiteSettings; service
 
       <div className="container-x grid gap-12 py-16 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <Link href="/" className="inline-flex rounded" aria-label="Nuvsera Technology — home"><Logo logoUrl={c.logoUrl || undefined} /></Link>
+          <Link href="/" className="inline-flex rounded" aria-label="Nuvsera Technology Private Limited, home"><Logo logoUrl={c.logoUrl || undefined} /></Link>
           <p className="mt-6 max-w-sm font-serif text-2xl leading-snug text-ivory">{c.tagline}.</p>
           <p className="mt-3 max-w-sm text-sm leading-6">
             Custom software, blockchain and cybersecurity. Builders and owners of{" "}
-            <a href="https://nsexchange.com" target="_blank" rel="noopener" className="text-gold underline-offset-4 hover:underline">NS Exchange</a>.
+            <a href="https://nsexchange.com" target="_blank" rel="noopener" className="text-gold underline underline-offset-4">NS Exchange</a>.
           </p>
           <address className="mt-6 text-sm not-italic leading-6">
             {c.legalName}<br />
@@ -77,13 +77,13 @@ export function Footer({ settings, services }: { settings: SiteSettings; service
         <nav className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-5" aria-label="Footer">
           <div>
             <h3 className="font-display text-sm tracking-[0.15em] text-ivory">Services</h3>
-            <ul className="mt-5 space-y-3 text-sm">
+            <ul className="mt-4 space-y-1 text-sm [&_a]:inline-block [&_a]:py-1.5 [&_button]:py-1.5">
               {services.map((s) => <li key={s.slug}><Link href={`/services/${s.slug}`} className="hover:text-gold">{s.title}</Link></li>)}
             </ul>
           </div>
           <div>
             <h3 className="font-display text-sm tracking-[0.15em] text-ivory">Company</h3>
-            <ul className="mt-5 space-y-3 text-sm">
+            <ul className="mt-4 space-y-1 text-sm [&_a]:inline-block [&_a]:py-1.5 [&_button]:py-1.5">
               {[["/about", "About"], ["/products/ns-exchange", "NS Exchange"], ["/portfolio", "Work"], ["/process", "Our Process"], ["/careers", "Careers"], ["/blog", "Insights"], ["/contact", "Contact"], ["/get-a-quote", "Start a Project"]].map(([h, l]) => (
                 <li key={h}><Link href={h} className="hover:text-gold">{l}</Link></li>
               ))}
@@ -92,7 +92,7 @@ export function Footer({ settings, services }: { settings: SiteSettings; service
           </div>
           <div>
             <h3 className="font-display text-sm tracking-[0.15em] text-ivory">Legal</h3>
-            <ul className="mt-5 space-y-3 text-sm">
+            <ul className="mt-4 space-y-1 text-sm [&_a]:inline-block [&_a]:py-1.5 [&_button]:py-1.5">
               <li><Link href="/privacy-policy" className="hover:text-gold">Privacy Policy</Link></li>
               <li><Link href="/terms-and-conditions" className="hover:text-gold">Terms &amp; Conditions</Link></li>
               <li><Link href="/cookie-policy" className="hover:text-gold">Cookie Policy</Link></li>

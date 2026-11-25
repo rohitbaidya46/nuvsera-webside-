@@ -4,7 +4,7 @@ import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { Model, SceneRig } from "./Scene";
-import { BRAND, dprFor, listenPointer, pointer, type Quality } from "./runtime";
+import { BRAND, dprFor, introSeg, introTime, listenPointer, pointer, type Quality } from "./runtime";
 
 /** Gold dust in two depth layers that drifts opposite to the mouse (parallax). */
 function Particles({ count }: { count: number }) {
@@ -26,6 +26,8 @@ function Particles({ count }: { count: number }) {
   }, [count]);
   useFrame((state, dt) => {
     const t = state.clock.elapsedTime;
+    const fade = introSeg(introTime(), 1.2, 4.5);
+    for (const p of [near.current, far.current]) if (p) (p.material as THREE.PointsMaterial).opacity = (p === near.current ? 0.9 : 0.6) * fade;
     if (near.current) {
       near.current.position.x = THREE.MathUtils.damp(near.current.position.x, -pointer.x * 0.45, 2.5, dt);
       near.current.position.y = THREE.MathUtils.damp(near.current.position.y, -pointer.y * 0.3, 2.5, dt);
@@ -59,9 +61,49 @@ function CursorLight() {
   return <pointLight ref={l} position={[0, 0, 3]} intensity={14} distance={9} color="#fff1d0" />;
 }
 
+/**
+ * Cinematic intro (first visit to the home page, ~6.5 s): the scene rises out of darkness, a narrow light
+ * sweeps across the gold, and the camera dollies out from a close, angled shot to the resting hero framing.
+ * Afterwards the camera stays put and the normal interactive behaviour takes over.
+ */
+function IntroDirector({ target }: { target: React.RefObject<THREE.Group | null> }) {
+  const { camera, gl } = useThree();
+  const sweep = useRef<THREE.PointLight>(null);
+  const look = useRef(new THREE.Vector3());
+  const done = useRef(false);
+  useFrame(() => {
+    const it = introTime();
+    const crest = target.current?.position ?? new THREE.Vector3();
+    if (!Number.isFinite(it)) {
+      if (!done.current) {
+        done.current = true;
+        camera.position.set(0, 0, 7);
+        camera.lookAt(0, 0, 0);
+        gl.toneMappingExposure = 1;
+        if (sweep.current) sweep.current.intensity = 0;
+      }
+      return;
+    }
+    done.current = false;
+    const dolly = introSeg(it, 0, 4.6);
+    // Start close and low-left of the crest, end at the resting framing (0, 0, 7) looking at the origin.
+    const from = new THREE.Vector3(crest.x - 1.4, crest.y - 0.5, 3.2);
+    camera.position.lerpVectors(from, new THREE.Vector3(0, 0, 7), dolly);
+    look.current.lerpVectors(crest, new THREE.Vector3(0, 0, 0), introSeg(it, 2.4, 4.6));
+    camera.lookAt(look.current);
+    gl.toneMappingExposure = 0.05 + 0.95 * introSeg(it, 0, 1.6);
+    if (sweep.current) {
+      const k = introSeg(it, 0.4, 3.0);
+      sweep.current.position.set(crest.x - 3 + k * 6, crest.y + 1.2 - k * 1.6, 1.6);
+      sweep.current.intensity = Math.sin(Math.min(1, Math.max(0, (it - 0.4) / 2.6)) * Math.PI) * 60;
+    }
+  });
+  return <pointLight ref={sweep} intensity={0} distance={6} decay={1.6} color="#fff4dc" />;
+}
+
 /** Desktop: crest on the right half. Portrait/mobile: centred above the headline. */
-function Placement({ children }: { children: React.ReactNode }) {
-  const g = useRef<THREE.Group>(null);
+function Placement({ children, groupRef }: { children: React.ReactNode; groupRef: React.RefObject<THREE.Group | null> }) {
+  const g = groupRef;
   const { viewport, size } = useThree();
   useFrame(() => {
     if (!g.current) return;
@@ -74,6 +116,7 @@ function Placement({ children }: { children: React.ReactNode }) {
 
 export default function HeroCanvas({ quality, url, onReady }: { quality: Quality; url?: string; onReady?: () => void }) {
   useEffect(() => listenPointer(), []);
+  const crestRef = useRef<THREE.Group>(null);
   return (
     <Canvas
       aria-hidden
@@ -90,7 +133,8 @@ export default function HeroCanvas({ quality, url, onReady }: { quality: Quality
       <SceneRig fov={30} z={7} />
       <CursorLight />
       <Particles count={quality === "high" ? 1400 : 500} />
-      <Placement>
+      <IntroDirector target={crestRef} />
+      <Placement groupRef={crestRef}>
         <Suspense fallback={null}>
           <Model model="hero" quality={quality} interactive scrollKey="hero" url={url} />
         </Suspense>

@@ -1,10 +1,4 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
-@import "@fontsource/cinzel/latin-500.css";
-@import "@fontsource/cinzel/latin-600.css";
-@import "@fontsource/cormorant-garamond/latin-400.css";
-@import "@fontsource/cormorant-garamond/latin-500.css";
-@import "@fontsource/cormorant-garamond/latin-400-italic.css";
 @import "lenis/dist/lenis.css";
 @plugin "@tailwindcss/typography";
 
@@ -38,9 +32,9 @@
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Cinzel", "Trajan Pro", Georgia, serif;
-  --font-serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-cinzel), Georgia, serif;
+  --font-serif: var(--font-cormorant), Georgia, serif;
   --color-navy: #0a0e16;
   --color-navy-800: #111726;
   --color-navy-700: #1a2236;

@@ -49,7 +49,7 @@ export function Logo({ logoUrl, brand = "Nuvsera Technology", compact = false }:
     <span className="flex items-center gap-3">
       <LogoMark className="h-10 w-10 shrink-0" />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-[17px] font-semibold tracking-[0.34em] text-ivory">NUVSERA</span>
+        <span className="font-display text-[17px] font-semibold tracking-[0.34em] text-ivory">NUVSERA</span>{" "}
         {!compact && <span className="mt-1.5 text-[7.5px] font-medium tracking-[0.3em] text-gold/85">TECHNOLOGY PRIVATE LIMITED</span>}
       </span>
     </span>

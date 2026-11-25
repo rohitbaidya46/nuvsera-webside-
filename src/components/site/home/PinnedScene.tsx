@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef, type ReactNode } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { loadGsap } from "@/components/experience/gsap";
 import { scroll } from "@/components/three/state";
 
 /**
@@ -14,17 +13,25 @@ export function PinnedScene({ children, scrollKey, length = 1, className = "" }:
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    gsap.registerPlugin(ScrollTrigger);
-    const mm = gsap.matchMedia();
-    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
-      const st = ScrollTrigger.create({ trigger: el, start: "top top", end: `+=${Math.round(length * 100)}%`, pin: true, scrub: 0.6, onUpdate: (s) => (scroll[scrollKey] = s.progress) });
-      return () => st.kill();
+    let dead = false;
+    let revert = () => {};
+    loadGsap().then(({ gsap, ScrollTrigger }) => {
+      if (dead) return;
+      const mm = gsap.matchMedia();
+      revert = () => mm.revert();
+      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+        const st = ScrollTrigger.create({ trigger: el, start: "top top", end: `+=${Math.round(length * 100)}%`, pin: true, scrub: 0.6, onUpdate: (s) => (scroll[scrollKey] = s.progress) });
+        return () => st.kill();
+      });
+      mm.add("(max-width: 1023px), (prefers-reduced-motion: reduce)", () => {
+        const st = ScrollTrigger.create({ trigger: el, start: "top bottom", end: "bottom top", scrub: true, onUpdate: (s) => (scroll[scrollKey] = s.progress) });
+        return () => st.kill();
+      });
     });
-    mm.add("(max-width: 1023px), (prefers-reduced-motion: reduce)", () => {
-      const st = ScrollTrigger.create({ trigger: el, start: "top bottom", end: "bottom top", scrub: true, onUpdate: (s) => (scroll[scrollKey] = s.progress) });
-      return () => st.kill();
-    });
-    return () => mm.revert();
+    return () => {
+      dead = true;
+      revert();
+    };
   }, [scrollKey, length]);
   return (
     <div ref={ref} className={className}>

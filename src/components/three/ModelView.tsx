@@ -12,7 +12,7 @@ const Inner = dynamic(() => import("./ModelViewInner"), { ssr: false });
  * shared canvas is ready (lazy-loaded below the fold); visitors with reduced motion, Save-Data or no WebGL keep
  * the still image.
  */
-export function ModelView({ model, url, className = "", alt, scrollKey, icons, z }: { model: ModelKey; url?: string; className?: string; alt: string; scrollKey?: string; icons?: OrbitIcon[]; z?: number }) {
+export function ModelView({ model, url, className = "", alt, scrollKey, icons, z, eager = false }: { model: ModelKey; url?: string; className?: string; alt: string; scrollKey?: string; icons?: OrbitIcon[]; z?: number; /** Load the still immediately (near the top of the page). */ eager?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [quality, setQuality] = useState<Quality | null>(null);
   const [near, setNear] = useState(false);
@@ -32,10 +32,8 @@ export function ModelView({ model, url, className = "", alt, scrollKey, icons, z
       <img
         src={`/images/3d/${model}.webp`}
         alt={alt}
-        loading="lazy"
+        loading={eager ? "eager" : "lazy"}
         decoding="async"
-        width={800}
-        height={800}
         className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-1000 ${live ? "opacity-0" : "opacity-100"}`}
       />
       {live && <Inner model={model} quality={quality} url={url} scrollKey={scrollKey} icons={icons} z={z} />}

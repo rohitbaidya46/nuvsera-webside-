@@ -40,13 +40,24 @@ export type Quality = "high" | "lite" | "off";
 export function detectQuality(): Quality {
   if (typeof window === "undefined") return "off";
   try {
+    // Manual override for testing and for rendering stills: ?3d=high|lite|off (remembered for the visit).
+    const forced = new URLSearchParams(location.search).get("3d") || sessionStorage.getItem("nv_3d");
+    if (forced === "high" || forced === "lite" || forced === "off") {
+      sessionStorage.setItem("nv_3d", forced);
+      return forced;
+    }
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return "off";
     const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
     if (nav.connection?.saveData) return "off";
     if (nav.deviceMemory !== undefined && nav.deviceMemory < 2) return "off";
     const c = document.createElement("canvas");
-    const gl = c.getContext("webgl2") || c.getContext("webgl");
+    const gl = (c.getContext("webgl2") || c.getContext("webgl")) as WebGLRenderingContext | null;
     if (!gl) return "off";
+    // Software rasterisers (no GPU acceleration) make real-time 3D stutter and block the page: use stills.
+    const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+    const renderer = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer)) return "off";
     const coarse = matchMedia("(pointer: coarse)").matches;
     const small = window.innerWidth < 900;
     const weak = (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4;
@@ -81,4 +92,33 @@ export function useViewsReady() {
     () => viewsReady,
     () => false,
   );
+}
+
+/**
+ * Cinematic intro clock (home page, first visit). Scenes read introTime(): seconds since the intro started,
+ * or Infinity when no intro is playing. skipIntro() jumps straight to the final frame.
+ */
+export const INTRO_DURATION = 6.5;
+export const intro = { start: -1, active: false };
+export function startIntro() {
+  intro.start = performance.now();
+  intro.active = true;
+}
+export function skipIntro() {
+  if (intro.active) intro.start = performance.now() - INTRO_DURATION * 1000;
+}
+export function introTime() {
+  if (!intro.active) return Infinity;
+  const t = (performance.now() - intro.start) / 1000;
+  if (t >= INTRO_DURATION + 0.5) {
+    intro.active = false;
+    return Infinity;
+  }
+  return t;
+}
+/** 0…1 progress of a segment [a, b] of the intro, eased (easeInOutCubic). 1 when no intro is playing. */
+export function introSeg(t: number, a: number, b: number) {
+  if (!Number.isFinite(t)) return 1;
+  const x = Math.min(1, Math.max(0, (t - a) / (b - a)));
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }

@@ -72,7 +72,7 @@ export function Header({ services, phone, logoUrl }: { services: NavService[]; p
         Skip to content
       </a>
       <div className="container-x flex h-[72px] items-center justify-between gap-4 lg:h-20">
-        <Link href="/" className="shrink-0 rounded" aria-label="Nuvsera Technology — home">
+        <Link href="/" className="shrink-0 rounded" aria-label="Nuvsera Technology Private Limited, home">
           <Logo logoUrl={logoUrl} />
         </Link>
 

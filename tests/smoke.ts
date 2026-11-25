@@ -45,7 +45,7 @@ function leadForm(overrides: Record<string, string> = {}) {
   const fd = new FormData();
   const base: Record<string, string> = {
     type: "contact", name: "[SMOKE] Test Lead", company: "Smoke Co", email: "smoke@example.com", phone: "+91 98765 43210",
-    service: "web-development", budget: "₹5 – 15 Lakh", timeline: "1 – 3 months", message: "This is an automated smoke-test enquiry.",
+    service: "custom-software-development", budget: "₹5 – 15 Lakh", timeline: "1 – 3 months", message: "This is an automated smoke-test enquiry.",
     consent: "on", startedAt: String(Date.now() - 10_000),
     attribution: JSON.stringify({ utm_source: "linkedin", utm_medium: "cpc", utm_campaign: "smoke", landingPage: "/?utm_source=linkedin", sourcePage: "/contact" }),
     ...overrides,
@@ -58,11 +58,14 @@ async function main() {
   const pub = new Client();
 
   // ── Public pages ──
-  for (const p of ["/", "/services", "/services/cybersecurity-audit", "/products/ns-exchange", "/about", "/process", "/portfolio", "/careers", "/blog", "/contact", "/get-a-quote", "/privacy-policy", "/terms-and-conditions", "/refund-and-cancellation-policy", "/sitemap.xml", "/robots.txt"]) {
+  for (const p of ["/", "/services", "/services/cybersecurity", "/products/ns-exchange", "/about", "/process", "/portfolio", "/careers", "/blog", "/contact", "/get-a-quote", "/privacy-policy", "/terms-and-conditions", "/refund-and-cancellation-policy", "/cookie-policy", "/sitemap.xml", "/robots.txt"]) {
     const r = await pub.req(p);
     ok(r.status === 200, `GET ${p} → ${r.status}`);
   }
+  const legacy = await pub.req("/services/cybersecurity-audit");
+  ok([301, 308].includes(legacy.status) && (legacy.headers.get("location") || "").endsWith("/services/cybersecurity"), "Old service URL redirects permanently to its successor");
   const home = await (await pub.req("/")).text();
+  ok(home.includes("+91 97343 33355") && home.includes("wa.me/919734333355"), "Home page shows the current phone and WhatsApp number");
   ok(home.includes("U62013WB2025PTC283873") && home.includes("19AAKCN9781A1Z2") && home.includes("UDYAM-WB-10-0197639"), "Footer shows CIN, GSTIN and Udyam");
   ok(home.includes('"LocalBusiness"') && home.includes('"Organization"'), "Organization + LocalBusiness JSON-LD present");
   ok(!home.includes("googletagmanager.com/gtag"), "No analytics script before consent");

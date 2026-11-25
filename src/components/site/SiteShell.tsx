@@ -1,7 +1,9 @@
+import { cookies, headers } from "next/headers";
+import { CONSENT_COOKIE, CONSENT_VERSION } from "@/lib/constants";
 import { getServices } from "@/lib/content";
 import { env } from "@/lib/env";
 import { fullAddress, getSettings } from "@/lib/settings";
-import { ExperienceLayer } from "@/components/experience/ExperienceLayer";
+import { LazyExperienceLayer as ExperienceLayer } from "@/components/experience/LazyExperienceLayer";
 import { Preloader } from "@/components/experience/Preloader";
 import { AttributionTracker } from "./AttributionTracker";
 import { ConsentManager } from "./ConsentManager";
@@ -12,18 +14,26 @@ import { JsonLd } from "./JsonLd";
 import { RevealObserver } from "./RevealObserver";
 
 export async function SiteShell({ children }: { children: React.ReactNode }) {
-  const [settings, services] = await Promise.all([getSettings(), getServices()]);
+  const [settings, services, h, jar] = await Promise.all([getSettings(), getServices(), headers(), cookies()]);
+  let hasConsent = false;
+  try {
+    hasConsent = JSON.parse(decodeURIComponent(jar.get(CONSENT_COOKIE)?.value || "null"))?.v === CONSENT_VERSION;
+  } catch {
+    /* malformed cookie: ask again */
+  }
+  // The home page has its own cinematic 3D intro, so the generic crest preloader is skipped there.
+  const isHome = h.get("x-pathname") === "/";
   const c = settings.company;
   const nav = services.map(({ slug, title, shortDescription, icon }) => ({ slug, title, shortDescription, icon }));
   const sameAs = Object.values(settings.social).filter(Boolean);
   return (
     <>
-      <Preloader />
+      {!isHome && <Preloader />}
       <Header services={nav} phone={c.phone} logoUrl={c.logoUrl || undefined} />
       <main id="main" tabIndex={-1} className="outline-none">{children}</main>
       <Footer settings={settings} services={nav} />
       <FloatingActions whatsapp={c.whatsapp} phone={c.phone} />
-      <ConsentManager tracking={settings.tracking} />
+      <ConsentManager tracking={settings.tracking} initialOpen={!hasConsent} />
       <AttributionTracker />
       <RevealObserver />
       <ExperienceLayer />

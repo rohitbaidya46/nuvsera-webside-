@@ -62,7 +62,7 @@ export default async function HomePage() {
     <>
       {/* 1. Hero */}
       <section className="relative -mt-[72px] flex min-h-[100svh] items-end overflow-hidden pt-[72px] lg:-mt-20 lg:items-center lg:pt-20" aria-labelledby="hero-heading">
-        <HeroVisual modelUrl={settings.models.hero || undefined} />
+        <HeroVisual modelUrl={settings.models.hero || undefined} cinematic />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy via-navy/70 to-transparent lg:bg-gradient-to-r lg:from-navy lg:via-navy/60 lg:to-transparent" aria-hidden />
         <div className="noise pointer-events-none absolute inset-0" aria-hidden />
         <div className="container-x relative z-10 pb-24 pt-[46vh] lg:py-32">
@@ -103,7 +103,7 @@ export default async function HomePage() {
                   <Link href={`/services/${slug}`} data-cursor="View" className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/[0.07] bg-gradient-to-b from-white/[0.04] to-white/[0.01] transition duration-500 hover:border-gold/40">
                     <div className="relative">
                       <div className="absolute inset-x-10 top-10 h-40 rounded-full bg-gold/10 blur-3xl transition duration-700 group-hover:bg-gold/20" aria-hidden />
-                      <ModelView model={model} url={settings.models[settingsKey] || undefined} alt={alt} className="h-72 sm:h-80" />
+                      <ModelView model={model} url={settings.models[settingsKey] || undefined} alt={alt} className="h-72 sm:h-80" eager />
                     </div>
                     <div className="flex flex-1 flex-col p-8 pt-2">
                       <p className="font-display text-sm tracking-[0.2em] text-gold">0{n + 1}</p>

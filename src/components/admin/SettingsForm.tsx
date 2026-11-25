@@ -106,20 +106,10 @@ export function SettingsForm({ initial }: { initial: S }) {
 
       <Panel title="Home page hero">
         <div className="space-y-4">
-          {input("hero", "headline", "Main headline")}
+          {input("hero", "headline", "Main headline", { help: "The last three words are shown in gold italic." })}
           <div>
             <label className="field-label" htmlFor="hero-sub">Sub-headline</label>
             <textarea id="hero-sub" rows={3} className="field" value={s.hero.subheadline} onChange={(e) => upd("hero", "subheadline", e.target.value)} />
-          </div>
-          <div>
-            <p className="field-label">Rotating headlines (shown after the main headline)</p>
-            {s.hero.rotating.map((h, i) => (
-              <div key={i} className="mb-2 flex gap-2">
-                <input aria-label={`Rotating headline ${i + 1}`} className="field" value={h} onChange={(e) => upd("hero", "rotating", s.hero.rotating.map((x, n) => (n === i ? e.target.value : x)))} />
-                <button type="button" className="rounded p-2 text-muted hover:text-red-600" aria-label="Remove" onClick={() => upd("hero", "rotating", s.hero.rotating.filter((_, n) => n !== i))}><X className="h-4 w-4" /></button>
-              </div>
-            ))}
-            {s.hero.rotating.length < 5 && <button type="button" className="btn-outline" onClick={() => upd("hero", "rotating", [...s.hero.rotating, ""])}><Plus className="h-4 w-4" /> Add headline</button>}
           </div>
         </div>
       </Panel>

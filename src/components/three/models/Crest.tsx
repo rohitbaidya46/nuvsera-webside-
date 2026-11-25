@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import { N_PATH } from "@/components/site/Logo";
 import { GoldMaterial, SteelMaterial } from "../materials";
-import { BRAND, idleSeconds, pointer, scroll, type Quality } from "../runtime";
+import { BRAND, idleSeconds, introSeg, introTime, pointer, scroll, type Quality } from "../runtime";
 
 /** Same "N" path as the 2D logo, extruded with a bevel so the 3D and 2D marks always match. */
 function useNGeometry() {
@@ -42,6 +42,11 @@ export function Crest({ quality = "high", interactive = false, scrollKey }: { qu
     return arr;
   }, []);
   const tickRef = useRef<THREE.InstancedMesh>(null);
+  const nFront = useRef<THREE.Mesh>(null);
+  const nBack = useRef<THREE.Mesh>(null);
+  const diamond = useRef<THREE.Mesh>(null);
+  const halo = useRef<THREE.Mesh>(null);
+  const inIntro = useRef(false);
   useLayoutEffect(() => {
     const im = tickRef.current;
     if (!im) return;
@@ -53,6 +58,46 @@ export function Crest({ quality = "high", interactive = false, scrollKey }: { qu
     const g = group.current;
     if (!g) return;
     const t = state.clock.elapsedTime;
+
+    // ── Cinematic intro choreography (home page, first visit) ──
+    const it = interactive ? introTime() : Infinity;
+    const ticksIn = introSeg(it, 0.5, 2.4);
+    const nUp = introSeg(it, 1.0, 2.8);
+    const drop = introSeg(it, 2.5, 3.3);
+    if (tickRef.current) tickRef.current.rotation.z = (1 - ticksIn) * -Math.PI * 0.75;
+    if (nFront.current && nBack.current) {
+      nFront.current.position.z = 0.1 - (1 - nUp) * 0.16;
+      nBack.current.position.z = -0.1 + (1 - nUp) * 0.16;
+      nFront.current.scale.setScalar(0.82 + nUp * 0.18);
+      nBack.current.scale.setScalar(0.82 + nUp * 0.18);
+    }
+    if (diamond.current) {
+      const bounce = drop < 1 ? 1 - Math.pow(1 - drop, 3) : 1;
+      diamond.current.position.y = 1.76 + (1 - bounce) * 1.6;
+      diamond.current.rotation.y = (1 - bounce) * Math.PI * 3 + (Number.isFinite(it) ? 0 : t * 0.6);
+      const flash = Number.isFinite(it) ? Math.max(0, 1 - Math.abs(it - 3.35) / 0.45) : 0;
+      (diamond.current.material as THREE.MeshPhysicalMaterial).emissiveIntensity = (quality === "high" ? 1.1 : 0.6) + flash * 7;
+      if (halo.current) {
+        halo.current.scale.setScalar(0.2 + flash * 0.9 + (it > 3.35 && Number.isFinite(it) ? (it - 3.35) * 0.8 : 0));
+        (halo.current.material as THREE.MeshBasicMaterial).opacity = flash * 0.85;
+      }
+    }
+    if (!Number.isFinite(it) && inIntro.current) {
+      // Intro just ended: hold the hero pose for a few seconds before the idle spin begins.
+      inIntro.current = false;
+      pointer.active = true;
+      pointer.lastMove = performance.now() + 2500;
+    }
+    if (Number.isFinite(it)) {
+      inIntro.current = true;
+      // Face the camera while the intro plays; a slow reveal turn, no pointer influence yet.
+      const turn = 1 - introSeg(it, 0, 4.2);
+      g.rotation.set(turn * 0.25, turn * -0.9, 0);
+      g.position.y = 0;
+      spin.current = g.rotation.y;
+      return;
+    }
+
     if (!interactive) {
       g.rotation.y = Math.sin(t * 0.4) * 0.35;
       return;
@@ -105,14 +150,19 @@ export function Crest({ quality = "high", interactive = false, scrollKey }: { qu
         <GoldMaterial quality={quality} color={BRAND.goldDeep} />
       </mesh>
       {/* Serif N, front and back (the back copy is turned so it reads correctly when the crest spins) */}
-      <mesh geometry={n} position={[0, 0.05, 0.1]}>
+      <mesh ref={nFront} geometry={n} position={[0, 0.05, 0.1]}>
         <GoldMaterial quality={quality} />
       </mesh>
-      <mesh geometry={n} position={[0, 0.05, -0.1]} rotation={[0, Math.PI, 0]}>
+      <mesh ref={nBack} geometry={n} position={[0, 0.05, -0.1]} rotation={[0, Math.PI, 0]}>
         <GoldMaterial quality={quality} />
       </mesh>
       {/* Sapphire diamond */}
-      <mesh position={[0, 1.76, 0]} scale={[1, 1.35, 1]}>
+      {/* Blue shockwave ring when the diamond lands (intro only) */}
+      <mesh ref={halo} position={[0, 1.76, 0.02]} scale={0.2}>
+        <ringGeometry args={[0.9, 1, 64]} />
+        <meshBasicMaterial color={BRAND.blue} transparent opacity={0} toneMapped={false} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh ref={diamond} position={[0, 1.76, 0]} scale={[1, 1.35, 1]}>
         <octahedronGeometry args={[0.13, 0]} />
         {diamondMat}
       </mesh>

@@ -24,7 +24,7 @@ await page.addInitScript(() => {
   Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
   try { sessionStorage.setItem("nv_seen", "1"); } catch {}
 });
-await page.goto(base + "/", { waitUntil: "networkidle" });
+await page.goto(base + "/?3d=high", { waitUntil: "networkidle" });
 const reject = page.getByRole("button", { name: "Reject all" });
 if (await reject.count()) await reject.first().click();
 
