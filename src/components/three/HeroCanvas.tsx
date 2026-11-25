@@ -7,7 +7,7 @@ import { Model, SceneRig } from "./Scene";
 import { BRAND, dprFor, introSeg, introTime, listenPointer, pointer, type Quality } from "./runtime";
 
 /** Gold dust in two depth layers that drifts opposite to the mouse (parallax). */
-function Particles({ count }: { count: number }) {
+export function Particles({ count }: { count: number }) {
   const near = useRef<THREE.Points>(null);
   const far = useRef<THREE.Points>(null);
   const [a, b] = useMemo(() => {
