@@ -25,6 +25,7 @@ const frames = mkdtempSync(join(tmpdir(), "nv-film-"));
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 const page = await browser.newPage({ viewport: size, deviceScaleFactor: 1 });
 await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
+await page.clock.pauseAt(new Date("2026-01-01T00:00:01Z")); // time only moves when we step it
 await page.goto(`${base}/film?render=1${format === "vertical" ? "&format=vertical" : ""}`, { waitUntil: "domcontentloaded" });
 // Let the scene load, compile shaders and fonts settle (advance the fake clock while waiting).
 for (let i = 0; i < 240; i++) {
