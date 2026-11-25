@@ -126,7 +126,7 @@ Subscribers confirm by email (double opt-in). Export **Active** subscribers as C
 | Panel | What to set |
 |---|---|
 | Company & legal | Legal name, brand, **CIN, GSTIN, Udyam**. These appear in the footer. Optional logo. |
-| Contact details | Public email (shown everywhere), phone, **WhatsApp number** (digits with country code, e.g. `917872994746`), address, hours, map link |
+| Contact details | Public email (shown everywhere), phone, **WhatsApp number** (digits with country code, e.g. `919734333355`), address, hours, map link |
 | Social links | Shown in the footer only when filled in |
 | Home page hero | Main headline, rotating headlines, sub-headline |
 | Company statistics | **Hidden on the website until at least one figure is entered.** Use only real, verifiable numbers. |

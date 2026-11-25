@@ -1,6 +1,8 @@
 import { getServices } from "@/lib/content";
 import { env } from "@/lib/env";
 import { fullAddress, getSettings } from "@/lib/settings";
+import { ExperienceLayer } from "@/components/experience/ExperienceLayer";
+import { Preloader } from "@/components/experience/Preloader";
 import { AttributionTracker } from "./AttributionTracker";
 import { ConsentManager } from "./ConsentManager";
 import { FloatingActions } from "./FloatingActions";
@@ -16,6 +18,7 @@ export async function SiteShell({ children }: { children: React.ReactNode }) {
   const sameAs = Object.values(settings.social).filter(Boolean);
   return (
     <>
+      <Preloader />
       <Header services={nav} phone={c.phone} logoUrl={c.logoUrl || undefined} />
       <main id="main" tabIndex={-1} className="outline-none">{children}</main>
       <Footer settings={settings} services={nav} />
@@ -23,6 +26,7 @@ export async function SiteShell({ children }: { children: React.ReactNode }) {
       <ConsentManager tracking={settings.tracking} />
       <AttributionTracker />
       <RevealObserver />
+      <ExperienceLayer />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -34,15 +38,28 @@ export async function SiteShell({ children }: { children: React.ReactNode }) {
               alternateName: c.brandName,
               url: env.appUrl,
               logo: `${env.appUrl}/icon.svg`,
+              slogan: c.tagline,
               email: c.email,
               telephone: c.phone,
               taxID: c.gstin,
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: `${c.addressLine1}, ${c.addressLine2}`,
+                addressLocality: c.city,
+                addressRegion: c.state,
+                postalCode: c.postalCode,
+                addressCountry: "IN",
+              },
+              contactPoint: [
+                { "@type": "ContactPoint", contactType: "sales", telephone: c.phone, email: c.projectsEmail || c.email, areaServed: ["IN", "Worldwide"], availableLanguage: ["en", "hi", "bn"] },
+                { "@type": "ContactPoint", contactType: "customer support", telephone: c.phone, email: c.supportEmail || c.email },
+              ],
               identifier: [
                 { "@type": "PropertyValue", propertyID: "CIN", value: c.cin },
                 { "@type": "PropertyValue", propertyID: "GSTIN", value: c.gstin },
                 { "@type": "PropertyValue", propertyID: "Udyam", value: c.udyam },
               ],
-              subOrganization: { "@type": "Organization", name: "NS Exchange", url: `${env.appUrl}/products/ns-exchange` },
+              owns: { "@type": "Brand", name: "NS Exchange", url: "https://nsexchange.com" },
               ...(sameAs.length ? { sameAs } : {}),
             },
             {

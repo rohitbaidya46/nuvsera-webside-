@@ -1,5 +1,6 @@
 import { Compass, Handshake, Lightbulb, ShieldCheck, UserRound } from "lucide-react";
 import { CtaBanner } from "@/components/site/CtaBanner";
+import { MapEmbed } from "@/components/site/MapEmbed";
 import { PageHero } from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/SectionHeading";
 import { getPage, getTeam } from "@/lib/content";
@@ -9,7 +10,7 @@ import { getSettings } from "@/lib/settings";
 export async function generateMetadata() {
   return buildMetadata("/about", {
     title: "About Us — Nuvsera Technology Private Limited, Kolkata",
-    description: "Nuvsera Technology is a Kolkata-based software, blockchain and cybersecurity company and the parent company of the NS Exchange crypto exchange platform.",
+    description: "Nuvsera Technology is a Kolkata-based software, blockchain and cybersecurity company that built and owns the NS Exchange crypto exchange (nsexchange.com).",
   }, await getPage("about"));
 }
 
@@ -29,8 +30,8 @@ export default async function AboutPage() {
       <section className="section">
         <div className="container-x grid gap-12 lg:grid-cols-3">
           <div className="prose-site lg:col-span-2" dangerouslySetInnerHTML={{ __html: page?.body || "" }} />
-          <aside className="card h-fit bg-surface">
-            <h2 className="text-lg font-semibold text-fg">Company information</h2>
+          <aside className="card h-fit">
+            <h2 className="font-display text-lg tracking-[0.06em] text-ivory">Registered details</h2>
             <dl className="mt-4 space-y-3 text-sm">
               {[
                 ["Legal name", c.legalName],
@@ -38,9 +39,9 @@ export default async function AboutPage() {
                 ["GSTIN", c.gstin],
                 ["Udyam registration", `${c.udyam} (${c.udyamCategory})`],
                 ["Registered office", `${c.addressLine1}, ${c.addressLine2}, ${c.city} – ${c.postalCode}, ${c.state}`],
-                ["Group company", "NS Exchange (crypto exchange platform)"],
+                ["Our product", "NS Exchange (nsexchange.com), built and owned by Nuvsera"],
               ].map(([k, v]) => (
-                <div key={k}><dt className="text-muted">{k}</dt><dd className="font-medium text-fg">{v}</dd></div>
+                <div key={k}><dt className="text-muted">{k}</dt><dd className="font-medium text-ivory">{v}</dd></div>
               ))}
             </dl>
           </aside>
@@ -54,7 +55,7 @@ export default async function AboutPage() {
             {VALUES.map(({ icon: Icon, title, text }) => (
               <li key={title} data-reveal className="card">
                 <Icon className="h-7 w-7 text-brand-700 dark:text-gold" aria-hidden />
-                <h3 className="mt-4 text-lg font-semibold text-fg">{title}</h3>
+                <h3 className="mt-5 font-display text-lg tracking-[0.05em] text-ivory">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted">{text}</p>
               </li>
             ))}
@@ -77,7 +78,7 @@ export default async function AboutPage() {
                       <UserRound className="h-12 w-12" />
                     </span>
                   )}
-                  <h3 className="mt-4 font-semibold text-fg">{m.name}</h3>
+                  <h3 className="mt-4 font-display text-lg tracking-[0.04em] text-ivory">{m.name}</h3>
                   <p className="text-sm text-muted">{m.designation}</p>
                   {m.bio && <p className="mt-3 text-sm leading-6 text-muted">{m.bio}</p>}
                   {m.linkedin && <a href={m.linkedin} className="link mt-3 inline-block text-sm" target="_blank" rel="noopener noreferrer">LinkedIn<span className="sr-only"> profile of {m.name}</span></a>}
@@ -85,8 +86,14 @@ export default async function AboutPage() {
               ))}
             </ul>
           ) : (
-            <p className="mt-6 text-muted">Team profiles will be published soon.</p>
+            <p className="mt-6 text-muted">Leadership profiles will be published soon.</p>
           )}
+        </div>
+      </section>
+      <section className="section" aria-labelledby="visit">
+        <div className="container-x grid items-center gap-10 lg:grid-cols-[1fr_1.4fr]">
+          <SectionHeading id="visit" eyebrow="Visit us" title="OM Tower, Park Street, Kolkata" intro={`${c.addressLine1}, ${c.addressLine2}, ${c.city} ${c.postalCode}, ${c.state}. ${c.businessHours}.`} />
+          <MapEmbed mapUrl={c.mapUrl} className="h-80 lg:h-[26rem]" />
         </div>
       </section>
       <CtaBanner />

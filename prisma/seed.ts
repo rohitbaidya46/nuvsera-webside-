@@ -9,7 +9,7 @@ try {
 }
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { PAGES } from "./seed-data/pages";
 import { SERVICES } from "./seed-data/services";
 import { LEGACY_SERVICE_REDIRECTS } from "../src/lib/constants";
@@ -29,8 +29,22 @@ const FAQS = [
   { category: "ns-exchange", question: "Does the platform support KYC and AML?", answer: "Yes. Onboarding integrates with KYC providers, and the platform includes transaction-monitoring hooks, record-keeping and reporting tools. Operators remain responsible for their own regulatory compliance." },
 ];
 
-const OLD_PHONE = /\+?91[\s-]*78729[\s-]*94746|\b78729[\s-]*94746\b|917872994746/g;
+// The retired company number is identified only by its SHA-256 (digits with country code), so the number
+// itself never appears anywhere in the codebase.
+const OLD_PHONE_SHA256 = "2fa4d414a92ae48fadd037c05a3c26c45aa5578ccb36117a46ba271cca9ff1c4";
 const NEW_PHONE = "+91 97343 33355";
+const NEW_WHATSAPP = "919734333355";
+const PHONE_LIKE = /\+?\d[\d\s-]{8,16}\d/g;
+
+/** Replaces every occurrence of the retired phone number (any formatting) with the current one. */
+function replaceOldPhone(text: string) {
+  return text.replace(PHONE_LIKE, (m) => {
+    let digits = m.replace(/\D/g, "");
+    if (digits.length === 10) digits = `91${digits}`;
+    if (createHash("sha256").update(digits).digest("hex") !== OLD_PHONE_SHA256) return m;
+    return /^\d+$/.test(m) ? NEW_WHATSAPP : NEW_PHONE;
+  });
+}
 
 /** One-off data fixes for databases seeded by earlier versions. Each runs once and is recorded in Setting "migrations". */
 async function dataMigrations() {
@@ -44,24 +58,24 @@ async function dataMigrations() {
   if (site?.value && typeof site.value === "object") {
     const v = site.value as Record<string, Record<string, unknown>>;
     const text = JSON.stringify(v);
-    if (OLD_PHONE.test(text)) {
-      const fixed = JSON.parse(text.replace(OLD_PHONE, (m) => (m.startsWith("9178") ? "919734333355" : NEW_PHONE)));
-      await prisma.setting.update({ where: { key: "site" }, data: { value: fixed } });
+    const fixedText = replaceOldPhone(text);
+    if (fixedText !== text) {
+      await prisma.setting.update({ where: { key: "site" }, data: { value: JSON.parse(fixedText) } });
       console.log("✔ Replaced the old phone number in site settings");
     }
-    OLD_PHONE.lastIndex = 0;
   }
   for (const p of await prisma.page.findMany({ select: { id: true, body: true, intro: true, seoDescription: true } })) {
     const fields = { body: p.body, intro: p.intro, seoDescription: p.seoDescription };
     const data: Record<string, string> = {};
-    for (const [k, val] of Object.entries(fields)) if (val && val.search(OLD_PHONE) >= 0) data[k] = val.replace(OLD_PHONE, NEW_PHONE);
+    for (const [k, val] of Object.entries(fields)) if (val && replaceOldPhone(val) !== val) data[k] = replaceOldPhone(val);
     if (Object.keys(data).length) {
       await prisma.page.update({ where: { id: p.id }, data });
       console.log(`✔ Replaced the old phone number on page ${p.id}`);
     }
   }
   for (const f of await prisma.faq.findMany({ select: { id: true, answer: true } })) {
-    if (f.answer.search(OLD_PHONE) >= 0) await prisma.faq.update({ where: { id: f.id }, data: { answer: f.answer.replace(OLD_PHONE, NEW_PHONE) } });
+    const answer = replaceOldPhone(f.answer);
+    if (answer !== f.answer) await prisma.faq.update({ where: { id: f.id }, data: { answer } });
   }
 
   // v2 service structure: five services replace the original eight. Old pages are unpublished (not deleted)

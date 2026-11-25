@@ -96,7 +96,7 @@ export const PAGES: { slug: string; title: string; intro?: string; body?: string
 </ul>
 <p>To exercise any right, email <a href="mailto:${EMAIL}">${EMAIL}</a> with the subject “Data request”. We will respond within the period prescribed under the DPDP Act and its rules.</p>
 
-<h2>8. Grievance Officer</h2>
+<h2 id="grievance-officer">8. Grievance Officer</h2>
 <p>[PLACEHOLDER — Name of Grievance Officer], ${CO}, ${ADDR}. Email: <a href="mailto:${SUPPORT}">${SUPPORT}</a> (subject “Grievance”) · Phone ${PHONE}. We acknowledge grievances within 48 hours and resolve them within the period prescribed under the DPDP Act and its rules. If you are not satisfied with our response, you may complain to the Data Protection Board of India.</p>
 
 <h2 id="cookies">9. Cookies</h2>

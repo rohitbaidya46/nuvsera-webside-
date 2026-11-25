@@ -1,18 +1,20 @@
 import Link from "next/link";
 import {
-  ArrowRight, BarChart3, Boxes, FileSearch, KeyRound, Layers, LayoutDashboard, ShieldAlert, Users2, Wallet,
+  ArrowRight, ArrowUpRight, BarChart3, Boxes, FileSearch, KeyRound, Layers, LayoutDashboard, ShieldAlert, Users2, Wallet,
 } from "lucide-react";
 import { CtaBanner } from "@/components/site/CtaBanner";
 import { FaqList } from "@/components/site/FaqList";
 import { PageHero } from "@/components/site/PageHero";
 import { SectionHeading } from "@/components/site/SectionHeading";
+import { ModelView } from "@/components/three/ModelView";
 import { getFaqs, getPage } from "@/lib/content";
+import { getSettings } from "@/lib/settings";
 import { buildMetadata } from "@/lib/seo";
 
 export async function generateMetadata() {
   return buildMetadata("/products/ns-exchange", {
     title: "NS Exchange — Crypto Exchange Platform by Nuvsera Technology",
-    description: "NS Exchange is the crypto exchange platform of the Nuvsera Technology group: spot and P2P trading, secure wallets, KYC/AML-ready onboarding and a complete operator console.",
+    description: "NS Exchange (nsexchange.com) is the crypto exchange built and owned by Nuvsera Technology: spot and P2P trading, secure wallets, KYC/AML-ready onboarding and a complete operator console.",
   }, await getPage("ns-exchange"));
 }
 
@@ -35,18 +37,19 @@ const SECURITY = [
 ];
 
 export default async function NsExchangePage() {
-  const [page, faqs] = await Promise.all([getPage("ns-exchange"), getFaqs("ns-exchange")]);
+  const [page, faqs, settings] = await Promise.all([getPage("ns-exchange"), getFaqs("ns-exchange"), getSettings()]);
   return (
     <>
       <PageHero
         eyebrow="Our product"
         title={page?.title || "NS Exchange"}
-        intro={page?.intro || "NS Exchange is the digital-asset exchange platform of the Nuvsera Technology group. We built it to the standard we would expect as users — fast, transparent and secure — and we use the same platform to help other businesses launch exchanges of their own."}
+        intro={page?.intro || "NS Exchange is the digital-asset exchange built and owned by Nuvsera Technology. We built it to the standard we would expect as users: fast, transparent and secure. The same engineering helps other businesses launch exchanges of their own."}
         crumbs={[{ href: "/products/ns-exchange", label: "NS Exchange" }]}
+        aside={<ModelView model="exchange" url={settings.models.exchange || undefined} alt="3D illustration: gold coin stacks in front of a blue candlestick-chart hologram" className="h-72 sm:h-96 lg:h-[30rem]" />}
       >
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/get-a-quote?service=crypto-exchange-development" className="btn-gold">Launch your own exchange <ArrowRight className="h-4 w-4" aria-hidden /></Link>
-          <Link href="/contact?service=crypto-exchange-development" className="btn-ghost-light">Request a demo</Link>
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <a href="https://nsexchange.com" target="_blank" rel="noopener" className="btn-gold">Visit nsexchange.com <ArrowUpRight className="h-4 w-4" aria-hidden /></a>
+          <Link href="/get-a-quote?service=blockchain-crypto-exchange-development" className="btn-ghost-light">Launch your own exchange <ArrowRight className="h-4 w-4" aria-hidden /></Link>
         </div>
       </PageHero>
 
@@ -57,7 +60,7 @@ export default async function NsExchangePage() {
             {MODULES.map(({ icon: Icon, title, text }) => (
               <li key={title} data-reveal className="card">
                 <Icon className="h-7 w-7 text-brand-700 dark:text-gold" aria-hidden />
-                <h3 className="mt-4 text-lg font-semibold text-fg">{title}</h3>
+                <h3 className="mt-5 font-display text-lg tracking-[0.05em] text-ivory">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted">{text}</p>
               </li>
             ))}
@@ -98,7 +101,7 @@ export default async function NsExchangePage() {
                 return <li key={t as string} className="flex items-center gap-3"><I className="h-5 w-5 text-brand-700 dark:text-gold" aria-hidden /> {t as string}</li>;
               })}
             </ul>
-            <Link href="/services/crypto-exchange-development" className="btn-navy mt-8">Crypto exchange development <ArrowRight className="h-4 w-4" aria-hidden /></Link>
+            <Link href="/services/blockchain-crypto-exchange-development" className="btn-navy mt-8">Crypto exchange development <ArrowRight className="h-4 w-4" aria-hidden /></Link>
           </div>
           <div data-reveal className="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-sm leading-6 text-amber-950 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100">
             <h3 className="text-base font-semibold">Important information</h3>
