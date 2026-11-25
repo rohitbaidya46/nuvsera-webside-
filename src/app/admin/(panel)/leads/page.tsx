@@ -35,10 +35,12 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
       <PageHeader
         title="Leads"
         description={`${count} matching enquiries`}
-        actions={can(user.role, "leads.export") && (
+        actions={(
           <>
+            <Link className="btn-outline" href="/admin/leads/clicks">WhatsApp &amp; call clicks</Link>
+            {can(user.role, "leads.export") && <>
             <a className="btn-outline" href={`/api/admin/leads/export?${qs({ format: "csv" })}`}><Download className="h-4 w-4" /> CSV</a>
-            <a className="btn-outline" href={`/api/admin/leads/export?${qs({ format: "xlsx" })}`}><Download className="h-4 w-4" /> Excel</a>
+            <a className="btn-outline" href={`/api/admin/leads/export?${qs({ format: "xlsx" })}`}><Download className="h-4 w-4" /> Excel</a></>}
           </>
         )}
       />

@@ -35,14 +35,11 @@ export type Resource = {
 };
 
 const SERVICE_OPTIONS = [
-  ["software-development", "Software Development"],
-  ["web-development", "Web Development"],
-  ["mobile-app-development", "Mobile App Development"],
-  ["blockchain-solutions", "Blockchain Solutions"],
-  ["crypto-exchange-development", "Crypto Exchange Platform Development"],
-  ["ai-integration", "AI Integration"],
-  ["cybersecurity-audit", "Cybersecurity Audit"],
-  ["data-analytics", "Data Analytics"],
+  ["custom-software-development", "Custom Software & Web/Mobile Apps"],
+  ["blockchain-crypto-exchange-development", "Blockchain & Crypto Exchange Development"],
+  ["smart-contracts-wallets", "Smart Contracts & Wallets"],
+  ["cybersecurity", "Cybersecurity"],
+  ["fintech-platforms", "Fintech Platforms"],
 ].map(([value, label]) => ({ value, label }));
 
 export const SEO_FIELDS: Field[] = [
@@ -91,7 +88,7 @@ export const RESOURCES: Resource[] = [
       { name: "shortDescription", label: "One-line description", type: "textarea", required: true, max: 300 },
       {
         name: "icon", label: "Icon", type: "select", required: true,
-        options: ["code", "globe", "smartphone", "blocks", "exchange", "bot", "shield", "chart"].map((v) => ({ value: v, label: v })),
+        options: ["code", "globe", "smartphone", "blocks", "exchange", "wallet", "landmark", "bot", "shield", "chart"].map((v) => ({ value: v, label: v })),
         group: "side",
       },
       { name: "overview", label: "Overview", type: "richtext", required: true },

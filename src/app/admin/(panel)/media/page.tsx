@@ -10,8 +10,8 @@ export default async function MediaPage() {
   const items = await prisma.media.findMany({ orderBy: { createdAt: "desc" }, take: 300 });
   return (
     <>
-      <PageHeader title="Media library" description="Images are automatically resized, stripped of location metadata and compressed to WebP." />
-      <MediaLibrary items={items.map(({ id, url, alt, filename, width, height, size }) => ({ id, url, alt, filename, width, height, size }))} />
+      <PageHeader title="Media library" description="Images are automatically resized, stripped of location metadata and compressed to WebP. You can also upload .glb 3D models for the website (Site settings → 3D models)." />
+      <MediaLibrary items={items.map(({ id, url, alt, filename, width, height, size, mimeType }) => ({ id, url, alt, filename, width, height, size, mimeType }))} />
     </>
   );
 }

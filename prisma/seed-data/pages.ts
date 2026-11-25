@@ -4,6 +4,8 @@
 const CO = "Nuvsera Technology Private Limited";
 const ADDR = "706, 7th Floor, OM Tower, 32 Chowringhee Road, Park Street, Kolkata – 700071, West Bengal, India";
 const EMAIL = "info@nuvseratechnology.com";
+const SUPPORT = "support@nuvseratechnology.com";
+const PHONE = "+91 97343 33355";
 
 export const PAGES: { slug: string; title: string; intro?: string; body?: string; isSystem: boolean; seoTitle?: string; seoDescription?: string }[] = [
   { slug: "home", title: "Home", isSystem: true },
@@ -18,15 +20,15 @@ export const PAGES: { slug: string; title: string; intro?: string; body?: string
   {
     slug: "about",
     title: "Engineering trust into every product we build",
-    intro: "Nuvsera Technology is a Kolkata-based technology company building custom software, blockchain platforms and security solutions — and the parent company of the NS Exchange crypto exchange.",
+    intro: "Nuvsera Technology is a Kolkata-based technology company building custom software, blockchain platforms and security solutions — and the company that built and owns the NS Exchange crypto exchange.",
     isSystem: false,
     body: `<h2>Who we are</h2>
 <p>${CO} was incorporated in 2025 in Kolkata, West Bengal, with a simple belief: businesses deserve technology partners who are as careful with their systems as they are ambitious about what those systems can do.</p>
 <p>We bring together software engineers, blockchain specialists, designers and security practitioners under one roof. That combination matters. A modern product is rarely “just” an app — it is an app, an API, a cloud environment, a data pipeline and, increasingly, an AI feature or a ledger. We design all of those parts to work together, and we secure them from the first line of code.</p>
 <h2>What we do</h2>
-<p>We work across eight practices: software development, web development, mobile apps, blockchain solutions, crypto exchange platforms, AI integration, cybersecurity audits and data analytics. Clients engage us for a single project, an ongoing product team, or an independent review of systems built by others.</p>
+<p>We work across five practices: custom software and web/mobile apps, blockchain and crypto exchange development, smart contracts and wallets, cybersecurity, and fintech platforms. Clients engage us for a single project, an ongoing product team, or an independent review of systems built by others.</p>
 <h2>NS Exchange</h2>
-<p>Our group operates <a href="/products/ns-exchange">NS Exchange</a>, a digital-asset exchange platform. Running a platform that handles real users and real assets keeps our standards high — the same practices we use there shape every client engagement.</p>
+<p>We built and own <a href="https://nsexchange.com" rel="noopener">NS Exchange</a>, a digital-asset exchange platform. Running a platform that handles real users and real assets keeps our standards high — the same practices we use there shape every client engagement.</p>
 <h2>How we work</h2>
 <ul>
 <li><strong>Clarity before code.</strong> Every engagement starts with a written scope, itemised pricing and agreed milestones.</li>
@@ -45,7 +47,7 @@ export const PAGES: { slug: string; title: string; intro?: string; body?: string
     body: `<p>This Privacy Policy explains how ${CO} (“<strong>Nuvsera</strong>”, “<strong>we</strong>”, “<strong>us</strong>”) processes digital personal data when you visit nuvseratechnology.com (the “<strong>Website</strong>”), contact us, apply for a job or use our services. We act as a <strong>Data Fiduciary</strong> under the Digital Personal Data Protection Act, 2023 (“<strong>DPDP Act</strong>”) and the rules made under it.</p>
 
 <h2>1. Who we are</h2>
-<p>${CO}, CIN U62013WB2025PTC283873, registered office: ${ADDR}. Contact: <a href="mailto:${EMAIL}">${EMAIL}</a>, +91 78729 94746.</p>
+<p>${CO}, CIN U62013WB2025PTC283873, registered office: ${ADDR}. Contact: <a href="mailto:${EMAIL}">${EMAIL}</a>, ${PHONE}.</p>
 
 <h2>2. Personal data we collect</h2>
 <ul>
@@ -95,7 +97,7 @@ export const PAGES: { slug: string; title: string; intro?: string; body?: string
 <p>To exercise any right, email <a href="mailto:${EMAIL}">${EMAIL}</a> with the subject “Data request”. We will respond within the period prescribed under the DPDP Act and its rules.</p>
 
 <h2>8. Grievance Officer</h2>
-<p>[PLACEHOLDER — Name of Grievance Officer], ${CO}, ${ADDR}. Email: <a href="mailto:${EMAIL}">${EMAIL}</a>. If you are not satisfied with our response, you may complain to the Data Protection Board of India.</p>
+<p>[PLACEHOLDER — Name of Grievance Officer], ${CO}, ${ADDR}. Email: <a href="mailto:${SUPPORT}">${SUPPORT}</a> (subject “Grievance”) · Phone ${PHONE}. We acknowledge grievances within 48 hours and resolve them within the period prescribed under the DPDP Act and its rules. If you are not satisfied with our response, you may complain to the Data Protection Board of India.</p>
 
 <h2 id="cookies">9. Cookies</h2>
 <p>We use three categories of cookies:</p>
@@ -104,6 +106,7 @@ export const PAGES: { slug: string; title: string; intro?: string; body?: string
 <li><strong>Analytics</strong> — Google Analytics 4, with IP anonymisation, to understand how the Website is used. Loaded only if you consent.</li>
 <li><strong>Marketing</strong> — Google Ads conversion tracking and the LinkedIn Insight Tag, to measure the effectiveness of our advertising. Loaded only if you consent.</li>
 </ul>
+<p>Separately, we count page views and daily unique visitors without cookies: we store only the page address and a hash that changes every day and cannot identify you. Do-Not-Track and Global Privacy Control signals are honoured. See our <a href="/cookie-policy">Cookie Policy</a> for the full list.</p>
 <p>You can change or withdraw your choice at any time using “Cookie settings” in the footer of every page.</p>
 
 <h2>10. Security</h2>
@@ -185,7 +188,7 @@ export const PAGES: { slug: string; title: string; intro?: string; body?: string
 <p>These Terms are governed by the laws of India. The parties will first try to resolve disputes amicably within 30 days. Failing that, disputes will be referred to arbitration by a sole arbitrator under the Arbitration and Conciliation Act, 1996, seated in Kolkata, in English. Subject to this, the courts at Kolkata, West Bengal have exclusive jurisdiction.</p>
 
 <h2>12. Contact</h2>
-<p>${CO}, ${ADDR}. Email <a href="mailto:${EMAIL}">${EMAIL}</a> · Phone +91 78729 94746.</p>`,
+<p>${CO}, ${ADDR}. Email <a href="mailto:${EMAIL}">${EMAIL}</a> · Phone ${PHONE}.</p>`,
   },
   {
     slug: "refund-and-cancellation-policy",
@@ -227,5 +230,33 @@ export const PAGES: { slug: string; title: string; intro?: string; body?: string
 
 <h2>7. How to request a cancellation or refund</h2>
 <p>Email <a href="mailto:${EMAIL}">${EMAIL}</a> with your company name, project or invoice reference and the reason for your request. We will acknowledge it within 2 business days.</p>`,
+  },
+  {
+    slug: "cookie-policy",
+    title: "Cookie Policy",
+    intro: "Which cookies and similar technologies nuvseratechnology.com uses, why, and how you control them.",
+    isSystem: false,
+    seoTitle: "Cookie Policy | Nuvsera Technology",
+    seoDescription: "How Nuvsera Technology uses strictly necessary, analytics and marketing cookies, and how to change your choice at any time.",
+    body: `<p>This Cookie Policy explains how ${CO} uses cookies and similar technologies on nuvseratechnology.com. It should be read together with our <a href="/privacy-policy">Privacy Policy</a>.</p>
+
+<h2>1. What cookies are</h2>
+<p>Cookies are small text files stored by your browser. Similar technologies include local and session storage. Some are needed for the Website to work; others are optional and used only with your consent, in line with the Digital Personal Data Protection Act, 2023.</p>
+
+<h2>2. Cookies we use</h2>
+<table><thead><tr><th>Category</th><th>Name / provider</th><th>Purpose</th><th>Duration</th></tr></thead><tbody>
+<tr><td>Strictly necessary</td><td><code>nv_consent</code> (Nuvsera)</td><td>Remembers your cookie choice</td><td>12 months</td></tr>
+<tr><td>Strictly necessary</td><td><code>__Host-nv_admin</code> (Nuvsera, admin panel only)</td><td>Keeps staff signed in securely</td><td>Up to 12 hours</td></tr>
+<tr><td>Strictly necessary</td><td>Session storage <code>nv_attr</code>, <code>nv_seen</code></td><td>Remembers how you arrived (sent only with a form or button click) and skips the intro animation on later pages</td><td>Until the tab is closed</td></tr>
+<tr><td>Analytics (optional)</td><td>Google Analytics 4 (<code>_ga</code>, <code>_ga_*</code>)</td><td>Understand how the Website is used</td><td>Up to 13 months</td></tr>
+<tr><td>Marketing (optional)</td><td>Google Ads, LinkedIn Insight Tag</td><td>Measure the effectiveness of our advertising</td><td>Up to 6 months</td></tr>
+</tbody></table>
+<p>Optional cookies are loaded <strong>only after you choose “Accept”</strong> in the cookie banner. Our own visitor statistics use no cookies at all: we count page views and daily unique visitors with a hash that changes every day, and we honour Do-Not-Track and Global Privacy Control.</p>
+
+<h2>3. Changing your choice</h2>
+<p>Use “Cookie settings” in the footer of any page to change or withdraw consent at any time. You can also delete cookies in your browser settings. Withdrawing consent does not affect processing that took place before.</p>
+
+<h2>4. Contact</h2>
+<p>Questions about this policy: <a href="mailto:${SUPPORT}">${SUPPORT}</a> · ${PHONE} · ${ADDR}.</p>`,
   },
 ];

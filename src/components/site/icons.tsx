@@ -1,5 +1,5 @@
 import {
-  BarChart3, Blocks, Bot, CandlestickChart, Code2, Globe, ShieldCheck, Smartphone, type LucideIcon,
+  BarChart3, Blocks, Bot, CandlestickChart, Code2, Globe, Landmark, ShieldCheck, Smartphone, WalletCards, type LucideIcon,
 } from "lucide-react";
 
 export const SERVICE_ICONS: Record<string, LucideIcon> = {
@@ -11,6 +11,8 @@ export const SERVICE_ICONS: Record<string, LucideIcon> = {
   bot: Bot,
   shield: ShieldCheck,
   chart: BarChart3,
+  wallet: WalletCards,
+  landmark: Landmark,
 };
 
 export function ServiceIcon({ name, className }: { name: string; className?: string }) {

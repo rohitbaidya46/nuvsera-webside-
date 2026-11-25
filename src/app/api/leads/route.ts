@@ -31,6 +31,9 @@ export const POST = route(async (req: Request) => {
   const raw = formToObject(fd);
   const quote = type === "QUOTE" ? quoteSchema.parse(raw) : null;
   const data = quote ?? contactSchema.parse(raw);
+  if (!(await prisma.service.count({ where: { slug: data.service, published: true } }))) {
+    throw new HttpError(422, "Please choose a service", { service: "Please choose a service" });
+  }
 
   let doc;
   try {

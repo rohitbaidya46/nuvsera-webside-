@@ -32,6 +32,10 @@ export const GET = route(async (req: Request) => {
     cleanupRateLimits(),
     prisma.session.deleteMany({ where: { expiresAt: { lt: new Date() } } }),
     prisma.passwordResetToken.deleteMany({ where: { expiresAt: { lt: new Date() } } }),
+    // Analytics retention: daily visitor hashes for 90 days, aggregated page views and clicks for 2 years.
+    prisma.visitorDaily.deleteMany({ where: { day: { lt: new Date(Date.now() - 90 * 86400000) } } }),
+    prisma.pageViewDaily.deleteMany({ where: { day: { lt: new Date(Date.now() - 730 * 86400000) } } }),
+    prisma.contactClick.deleteMany({ where: { createdAt: { lt: new Date(Date.now() - 730 * 86400000) } } }),
   ]);
   return json({ ok: true, reminders: due.length });
 });

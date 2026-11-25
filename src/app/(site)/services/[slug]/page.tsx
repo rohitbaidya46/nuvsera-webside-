@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { LEGACY_SERVICE_REDIRECTS } from "@/lib/constants";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { CtaBanner } from "@/components/site/CtaBanner";
 import { FaqList } from "@/components/site/FaqList";
@@ -21,7 +22,10 @@ export async function generateMetadata({ params }: Props) {
 export default async function ServiceDetail({ params }: Props) {
   const { slug } = await params;
   const [s, all] = await Promise.all([getService(slug), getServices()]);
-  if (!s) notFound();
+  if (!s) {
+    if (LEGACY_SERVICE_REDIRECTS[slug]) permanentRedirect(`/services/${LEGACY_SERVICE_REDIRECTS[slug]}`);
+    notFound();
+  }
   const steps = (s.process as ProcessStep[]) || [];
   const faqs = (s.faqs as FaqItem[]) || [];
   const others = all.filter((o) => o.slug !== s.slug).slice(0, 3);
