@@ -119,8 +119,8 @@ export function Shield({ quality = "high" }: { quality?: Quality }) {
           <sphereGeometry args={[0.31, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshPhysicalMaterial color="#cfe0ff" transparent opacity={0.18} roughness={0.02} metalness={0} clearcoat={1} envMapIntensity={2.5} depthWrite={false} />
         </mesh>
-        <group position={[0, 0, 0.25]}>
-          <Glow color="#3d6bff" scale={1.5} opacity={0.85} />
+        <group position={[0, 0, 0.06]}>
+          <Glow color="#3d6bff" scale={0.95} opacity={0.7} />
         </group>
       </group>
       <pointLight position={[0, 0.1, 0.8]} color={BRAND.blue} intensity={3} distance={3} />

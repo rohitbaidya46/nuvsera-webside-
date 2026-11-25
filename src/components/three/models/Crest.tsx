@@ -66,8 +66,9 @@ export function Crest({ quality = "high", interactive = false, scrollKey }: { qu
     const drop = introSeg(it, 2.5, 3.3);
     if (tickRef.current) tickRef.current.rotation.z = (1 - ticksIn) * -Math.PI * 0.75;
     if (nFront.current && nBack.current) {
-      nFront.current.position.z = 0.1 - (1 - nUp) * 0.16;
-      nBack.current.position.z = -0.1 + (1 - nUp) * 0.16;
+      // Rise out of the medallion face; front and back letters never cross (no mirrored "N").
+      nFront.current.position.z = 0.1 - (1 - nUp) * 0.07;
+      nBack.current.position.z = -0.1 + (1 - nUp) * 0.07;
       nFront.current.scale.setScalar(0.82 + nUp * 0.18);
       nBack.current.scale.setScalar(0.82 + nUp * 0.18);
     }

@@ -12,10 +12,10 @@ import { Particles } from "@/components/three/HeroCanvas";
 import { Model, SceneRig, type ModelKey } from "@/components/three/Scene";
 import { BRAND, introSeg, scroll, startIntro } from "@/components/three/runtime";
 
-type Shot = { key: ModelKey | "end"; from: number; to: number; cam: [[number, number, number], [number, number, number]]; kicker?: string; title?: string; sub?: string };
+type Shot = { key: ModelKey | "end"; from: number; to: number; cam: [[number, number, number], [number, number, number]]; look?: number; kicker?: string; title?: string; sub?: string };
 
 export const SHOTS: Shot[] = [
-  { key: "hero", from: 0, to: 6.8, cam: [[-1.4, -0.5, 3.2], [0, 0, 6.6]] },
+  { key: "hero", from: 0, to: 6.8, cam: [[-1.4, -0.5, 3.6], [0, 0, 8.2]], look: -0.55 },
   { key: "blockchain", from: 6.8, to: 10.4, cam: [[1.6, 0.6, 5.2], [-0.3, 0.1, 6.4]], kicker: "Blockchain", title: "Exchanges, ledgers and the chains that bind them", sub: "Spot & P2P exchanges · custody-aware wallets · smart contracts" },
   { key: "security", from: 10.4, to: 14.0, cam: [[-0.6, -0.3, 4.4], [0.4, 0.1, 5.8]], kicker: "Cybersecurity", title: "Secured before it ships", sub: "VAPT · secure architecture · compliance-ready audits" },
   { key: "software", from: 14.0, to: 17.6, cam: [[-1.8, 1.2, 5.6], [0.2, 0.4, 6.6]], kicker: "Custom software", title: "Software shaped around your business", sub: "Web platforms · iOS & Android apps · fintech back offices" },
@@ -43,13 +43,13 @@ function Director({ vertical }: { vertical: boolean }) {
     const [a, b] = shot.cam;
     const zf = vertical ? 1.75 : 1; // narrower frame: pull back
     camera.position.set(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, (a[2] + (b[2] - a[2]) * k) * zf);
-    camera.lookAt(0, shot.key === "end" ? 0.55 : 0, 0);
+    camera.lookAt(0, shot.key === "end" ? 0.55 : (shot.look ?? 0) * k, 0);
     gl.toneMappingExposure = shot.key === "hero" ? 0.05 + 0.95 * introSeg(t, 0, 1.6) : 1;
     if (sweep.current) {
       const local = t - shot.from;
       const s = Math.min(1, Math.max(0, (local - 0.2) / 2.4));
       sweep.current.position.set(-3 + s * 6, 1.4 - s * 1.8, 1.8);
-      sweep.current.intensity = Math.sin(s * Math.PI) * (shot.key === "hero" ? 60 : 38);
+      sweep.current.intensity = Math.sin(s * Math.PI) * (shot.key === "hero" ? 40 : 22);
     }
     if (shot.key === "exchange") scroll.exchange = k;
   });
@@ -105,16 +105,16 @@ function Overlay({ vertical }: { vertical: boolean }) {
       {shot.key === "hero" && (
         <div className={`absolute inset-x-0 bottom-0 flex flex-col items-center ${vertical ? "pb-56" : "pb-20"}`}>
           <p style={rise(4.3)} className={`font-display font-semibold tracking-[0.5em] ${vertical ? "text-5xl" : "text-4xl"}`}>NUVSERA</p>
-          <p style={rise(4.7)} className="mt-4 text-sm tracking-[0.42em] text-gold">TECHNOLOGY PRIVATE LIMITED</p>
+          <p style={rise(4.7)} className="mt-4 text-xl tracking-[0.42em] text-gold">TECHNOLOGY PRIVATE LIMITED</p>
         </div>
       )}
       {shot.title && (
         <div className={`absolute inset-x-0 bottom-0 ${pad} ${vertical ? "text-center" : ""}`}>
-          <p style={rise(0.3)} className={`inline-flex items-center gap-4 text-sm font-semibold uppercase tracking-[0.4em] text-gold ${vertical ? "justify-center" : ""}`}>
+          <p style={rise(0.3)} className={`inline-flex items-center gap-4 text-xl font-semibold uppercase tracking-[0.4em] text-gold ${vertical ? "justify-center" : ""}`}>
             <span className="h-px w-10 bg-gold" /> {shot.kicker}
           </p>
           <h2 style={rise(0.5)} className={`mt-5 font-serif font-medium leading-[1.02] ${vertical ? "text-7xl" : "max-w-5xl text-[5.5rem]"}`}>{shot.title}</h2>
-          <p style={rise(0.8)} className={`mt-6 tracking-wide text-muted ${vertical ? "text-2xl" : "text-2xl"}`}>{shot.sub}</p>
+          <p style={rise(0.8)} className="mt-6 text-3xl tracking-wide text-ivory/70">{shot.sub}</p>
         </div>
       )}
       {shot.key === "end" && (
@@ -122,9 +122,9 @@ function Overlay({ vertical }: { vertical: boolean }) {
           <h2 style={rise(0.4)} className={`font-serif font-medium leading-[1.02] ${vertical ? "text-7xl" : "text-8xl"}`}>
             Technology for <em className="text-gold-gradient">secure digital finance</em>
           </h2>
-          <p style={rise(1.0)} className="mt-8 text-sm uppercase tracking-[0.42em] text-muted">Custom Software · Blockchain · Cybersecurity</p>
+          <p style={rise(1.0)} className="mt-8 text-xl uppercase tracking-[0.42em] text-ivory/70">Custom Software · Blockchain · Cybersecurity</p>
           <p style={rise(1.6)} className={`mt-10 font-serif text-gold-gradient ${vertical ? "text-6xl" : "text-5xl"}`}>+91 97343 33355</p>
-          <p style={rise(1.9)} className="mt-3 text-lg tracking-[0.3em] text-ivory/80">NUVSERATECHNOLOGY.COM · KOLKATA</p>
+          <p style={rise(1.9)} className="mt-4 text-2xl tracking-[0.3em] text-ivory/80">NUVSERATECHNOLOGY.COM · KOLKATA</p>
         </div>
       )}
       <div className="absolute inset-0 bg-navy" style={{ opacity: Math.max(black, tail) }} />
@@ -162,7 +162,7 @@ export default function FilmCanvas({ vertical = false }: { vertical?: boolean })
           <ShotModels />
         </group>
         <EffectComposer multisampling={4}>
-          <Bloom mipmapBlur luminanceThreshold={0.85} luminanceSmoothing={0.2} intensity={0.7} radius={0.7} />
+          <Bloom mipmapBlur luminanceThreshold={0.92} luminanceSmoothing={0.15} intensity={0.42} radius={0.6} />
           <Vignette eskil={false} offset={0.2} darkness={0.7} />
         </EffectComposer>
       </Canvas>
