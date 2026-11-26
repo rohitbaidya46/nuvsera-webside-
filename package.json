@@ -17,6 +17,7 @@
     "backup": "tsx scripts/backup.ts",
     "backup:decrypt": "tsx scripts/decrypt-backup.ts",
     "test:smoke": "tsx tests/smoke.ts",
+    "telegram:chat-id": "node scripts/telegram-chat-id.mjs",
     "vercel-build": "prisma generate && prisma migrate deploy && tsx prisma/seed.ts && next build"
   },
   "prisma": {

@@ -7,6 +7,7 @@ import { sendLeadEmails } from "@/lib/email/notifications";
 import { env } from "@/lib/env";
 import { HttpError, clientIp, json, route, userAgent } from "@/lib/http";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { notifyLeadTelegram } from "@/lib/telegram";
 import { plain } from "@/lib/sanitize";
 import { putObject } from "@/lib/storage";
 import { readDocument, storageKey } from "@/lib/uploads";
@@ -83,5 +84,6 @@ export const POST = route(async (req: Request) => {
   });
 
   after(() => sendLeadEmails(lead).catch((e) => console.error("[lead] email failed", e)));
+  after(() => notifyLeadTelegram(lead).catch((e) => console.error("[lead] telegram failed", e)));
   return json({ ok: true, redirect: thanks });
 });

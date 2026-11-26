@@ -103,6 +103,18 @@ In development, if SMTP isn't configured, emails are printed to the console. If 
 | `npm run backup` | Run an encrypted application backup from the CLI |
 | `npm run backup:decrypt -- file.json.gz.enc` | Decrypt a backup (needs `ENCRYPTION_KEY`) |
 | `npm run test:smoke` | End-to-end smoke test against a running instance (see `docs/TEST_CHECKLIST.md`) |
+| `npm run telegram:chat-id` | Finds your Telegram chat ID; add `-- --test` to send a test alert (see "Telegram alerts" below) |
+
+### Telegram alerts (optional)
+
+Get a Telegram message for every new enquiry, quote request and job application, alongside the email.
+
+1. In Telegram, open **@BotFather**, send `/newbot`, pick a name and username, and copy the token.
+2. Open your new bot and press **Start** (for a team, add the bot to a group and send a message there).
+3. Put the token in `.env` as `TELEGRAM_BOT_TOKEN`, then run `npm run telegram:chat-id` and copy the ID it prints into `TELEGRAM_CHAT_ID` (comma-separate several).
+4. Run `npm run telegram:chat-id -- --test` to check a message arrives. On Vercel, add both variables under Project → Settings → Environment Variables and redeploy.
+
+Leave either variable empty to switch alerts off. Treat the bot token like a password.
 
 ---
 

@@ -3,6 +3,7 @@ import { isBot, verifyCaptcha } from "@/lib/captcha";
 import { hashIp } from "@/lib/crypto";
 import { prisma } from "@/lib/db";
 import { sendApplicationEmails } from "@/lib/email/notifications";
+import { notifyApplicationTelegram } from "@/lib/telegram";
 import { HttpError, clientIp, json, route } from "@/lib/http";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { plain } from "@/lib/sanitize";
@@ -54,5 +55,6 @@ export const POST = route(async (req: Request) => {
     },
   });
   after(() => sendApplicationEmails(app, job?.title ?? null).catch(console.error));
+  after(() => notifyApplicationTelegram(app, job?.title ?? null).catch(console.error));
   return json({ ok: true, redirect: "/thank-you?type=application" });
 });
