@@ -12,6 +12,8 @@ export function sanitizeRichText(html: string): string {
       img: ["src", "alt", "width", "height", "loading"],
       th: ["colspan", "rowspan"],
       td: ["colspan", "rowspan"],
+      h2: ["id"],
+      h3: ["id"],
     },
     allowedSchemes: ["http", "https", "mailto", "tel"],
     allowedSchemesByTag: { img: ["https", "http"] },

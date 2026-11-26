@@ -107,8 +107,9 @@ export function openCookieSettings() {
   window.dispatchEvent(new Event("nv:cookie-settings"));
 }
 
-export function ConsentManager({ tracking }: { tracking: Tracking }) {
-  const [open, setOpen] = useState(false);
+/** `initialOpen` is decided on the server from the consent cookie, so the banner is painted with the page. */
+export function ConsentManager({ tracking, initialOpen = false }: { tracking: Tracking; initialOpen?: boolean }) {
+  const [open, setOpen] = useState(initialOpen);
   const [settings, setSettings] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
@@ -120,6 +121,7 @@ export function ConsentManager({ tracking }: { tracking: Tracking }) {
       setAnalytics(c.analytics);
       setMarketing(c.marketing);
       applyConsent(c, tracking);
+      setOpen(false);
     } else {
       window.__nvTracking = tracking;
       setOpen(true);

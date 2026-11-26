@@ -468,3 +468,34 @@ model StoredFile {
   size        Int
   createdAt   DateTime @default(now())
 }
+
+// ───────────── Privacy-friendly analytics (no cookies, no raw IPs) ─────────────
+
+/** Page views aggregated per IST day and path. */
+model PageViewDaily {
+  day   DateTime @db.Date
+  path  String
+  views Int      @default(0)
+
+  @@id([day, path])
+  @@index([day])
+}
+
+/** One row per unique visitor per day. The hash rotates daily (HMAC of day + IP + user agent), so visitors can't be followed across days. */
+model VisitorDaily {
+  day  DateTime @db.Date
+  hash String
+
+  @@id([day, hash])
+}
+
+/** A click on a WhatsApp, call or email button: an enquiry that never reaches the contact form. */
+model ContactClick {
+  id        String   @id @default(cuid())
+  channel   String   // whatsapp | phone | email
+  page      String?
+  source    String?  // derived channel (google-ads, organic, …)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

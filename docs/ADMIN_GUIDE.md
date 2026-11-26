@@ -40,6 +40,7 @@ The dashboard shows:
 - **Leads per week**: hover over a bar for its numbers, or click *Show as table*
 - **By service** and **By source** for the last 30 days
 - **Follow-ups due** in the next 24 hours, and the **latest enquiries**
+- **Website, last 30 days**: unique visitors (7 and 30 days), page views, **WhatsApp / call clicks**, and the **top pages**. These figures use no cookies: a visitor is counted once per day through a code that changes every day, and visitors with Do-Not-Track / Global Privacy Control are not counted, so treat them as a minimum.
 
 Content Editors see a content overview instead.
 
@@ -74,6 +75,10 @@ When a lead arrives, the notification recipients (set in Site settings) get an e
 
 ---
 
+### WhatsApp & call enquiries
+
+**Leads → WhatsApp & call clicks** lists every click on a WhatsApp, call or email button: the time, the page and where the visitor came from (Google Ads, organic search, …). The conversation itself happens in WhatsApp or on the phone, so no name or number is recorded: once you have spoken to the person, add them as a lead. Export with **CSV**.
+
 ## 5. Content
 
 Every content screen works the same way: a list with search, **New**, and an edit form with a **Save** button. Most items have **Published** and **Display order** settings, and an **SEO settings** panel.
@@ -105,7 +110,8 @@ The toolbar has: bold, italic, headings (H2/H3), lists, quote, divider, link, im
 
 ## 6. Media library
 
-- Upload JPG, PNG, WebP or GIF images up to 8 MB. Each image is automatically **resized** (max 2000 px), **stripped of location metadata** and **compressed to WebP**.
+- Upload JPG, PNG, WebP, GIF or SVG images up to 8 MB. Each image is automatically **resized** (max 2000 px), **stripped of location metadata** and **compressed to WebP** (SVG logos are converted to a sharp WebP image, so no script inside an SVG can ever run).
+- Upload **.glb 3D models** (up to 15 MB; keep them under 1.5 MB). Paste the copied URL into **Site settings → 3D models**. See `docs/3D_ASSETS.md` for the Tripo AI prompts and compression steps.
 - Always add **alt text**: a short description of the image for people using screen readers. You can edit it on the card; it saves when you click away.
 - **Copy URL** gives you a link to use in content. Images can also be picked directly from the editor and from image fields.
 
@@ -126,9 +132,10 @@ Subscribers confirm by email (double opt-in). Export **Active** subscribers as C
 | Panel | What to set |
 |---|---|
 | Company & legal | Legal name, brand, **CIN, GSTIN, Udyam**. These appear in the footer. Optional logo. |
-| Contact details | Public email (shown everywhere), phone, **WhatsApp number** (digits with country code, e.g. `917872994746`), address, hours, map link |
+| Contact details | General email (shown everywhere), **support** and **projects/technical** emails, phone, **WhatsApp number** (digits with country code, e.g. `919734333355`), address, hours, map link |
 | Social links | Shown in the footer only when filled in |
-| Home page hero | Main headline, rotating headlines, sub-headline |
+| Home page hero | Main headline (the last three words are set in gold italic), sub-headline. |
+| 3D models | Optional .glb URL for each 3D slot (hero, software, blockchain, cybersecurity, NS Exchange). Blank = built-in model. |
 | Company statistics | **Hidden on the website until at least one figure is entered.** Use only real, verifiable numbers. |
 | Analytics & ad tracking | GA4 ID (`G-…`), Google Ads ID (`AW-…`) and lead conversion label, LinkedIn partner ID and conversion ID. These load only for visitors who consent to cookies. |
 | Email delivery (SMTP) | Notification recipients, from name and address, and SMTP details (Amazon SES / Brevo). The password is encrypted and never shown again. Save first, then click **Send test email to me**. |

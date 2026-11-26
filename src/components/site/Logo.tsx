@@ -1,23 +1,56 @@
-export function LogoMark({ className = "h-9 w-9" }: { className?: string }) {
+import { useId } from "react";
+
+/**
+ * Royal Crest mark: gold serif "N" inside a thin gold double ring, with a small royal-blue diamond on top.
+ * Drawn as vector paths (no font dependency) so it renders identically everywhere, including the favicon.
+ * `draw` turns it into the self-drawing outline used by the preloader.
+ */
+export const N_PATH =
+  "M20.6 20h7.6v1.2h-1.1L38.6 39V21.2h-2.3V20h7.2v1.2h-2.3V44h-2.2L25.4 24.6v18.2h2.3V44h-7.1v-1.2h2.3V21.2h-2.3z";
+
+export function LogoMark({ className = "h-10 w-10", draw = false, title }: { className?: string; draw?: boolean; title?: string }) {
+  const id = useId().replace(/:/g, "");
+  const gold = `url(#g${id})`;
+  const strokeProps = draw ? { className: "crest-stroke", pathLength: 1 } : {};
   return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden="true" focusable="false">
-      <rect width="40" height="40" rx="10" fill="#0B1B3A" />
-      <path d="M11 29V11l18 18V11" fill="none" stroke="#E3A93B" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="29" cy="11" r="2.6" fill="#3D6BFF" />
+    <svg viewBox="0 0 64 64" className={className} role={title ? "img" : undefined} aria-hidden={title ? undefined : true} aria-label={title} focusable="false">
+      <defs>
+        <linearGradient id={`g${id}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#F7D488" />
+          <stop offset="0.5" stopColor="#E3A93B" />
+          <stop offset="1" stopColor="#B9822A" />
+        </linearGradient>
+        <linearGradient id={`b${id}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#8FA8FF" />
+          <stop offset="1" stopColor="#3D6BFF" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="33" r="27.5" fill="none" stroke={gold} strokeWidth="1.6" {...strokeProps} />
+      <circle cx="32" cy="33" r="24" fill="none" stroke={gold} strokeWidth="0.8" {...strokeProps} />
+      {draw ? (
+        <>
+          <path d={N_PATH} fill="none" stroke={gold} strokeWidth="0.6" {...strokeProps} />
+          <path d={N_PATH} fill={gold} className="crest-fill" />
+        </>
+      ) : (
+        <path d={N_PATH} fill={gold} />
+      )}
+      <path d="M32 1.6 36 5.6 32 9.6 28 5.6Z" fill={`url(#b${id})`} stroke="#0A0E16" strokeWidth="0.8" className={draw ? "crest-fill" : undefined} />
     </svg>
   );
 }
 
-export function Logo({ logoUrl, brand = "Nuvsera Technology" }: { logoUrl?: string; brand?: string }) {
+export function Logo({ logoUrl, brand = "Nuvsera Technology", compact = false }: { logoUrl?: string; brand?: string; compact?: boolean }) {
   if (logoUrl) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={logoUrl} alt={brand} className="h-9 w-auto" width={160} height={36} />;
+    return <img src={logoUrl} alt={brand} className="h-10 w-auto" width={180} height={40} />;
   }
   return (
-    <span className="flex items-center gap-2.5">
-      <LogoMark />
-      <span className="text-lg font-bold leading-none tracking-tight text-fg">
-        Nuvsera<span className="font-semibold text-muted"> Technology</span>
+    <span className="flex items-center gap-3">
+      <LogoMark className="h-10 w-10 shrink-0" />
+      <span className="flex flex-col leading-none">
+        <span className="font-display text-[17px] font-semibold tracking-[0.34em] text-ivory">NUVSERA</span>{" "}
+        {!compact && <span className="mt-1.5 text-[7.5px] font-medium tracking-[0.3em] text-gold/85">TECHNOLOGY PRIVATE LIMITED</span>}
       </span>
     </span>
   );

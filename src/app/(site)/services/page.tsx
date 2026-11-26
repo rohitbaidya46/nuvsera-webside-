@@ -1,52 +1,65 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { GoldRule } from "@/components/experience/SplitText";
+import { TiltCard } from "@/components/experience/TiltCard";
 import { CtaBanner } from "@/components/site/CtaBanner";
-import { ServiceIcon } from "@/components/site/icons";
 import { PageHero } from "@/components/site/PageHero";
+import { ModelView } from "@/components/three/ModelView";
 import { getPage, getServices } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
+import { serviceModel } from "@/lib/service-models";
+import { getSettings } from "@/lib/settings";
 
 export async function generateMetadata() {
   return buildMetadata("/services", {
-    title: "Services — Software, Web, Mobile, Blockchain, AI & Security",
-    description: "Explore Nuvsera Technology’s eight engineering services: software, web and mobile development, blockchain, crypto exchange platforms, AI integration, cybersecurity audits and data analytics.",
+    title: "Services — Custom Software, Blockchain, Smart Contracts, Cybersecurity & Fintech",
+    description: "Nuvsera Technology’s services: custom software and web/mobile apps, blockchain and crypto exchange development, smart contracts and wallets, cybersecurity (audits, VAPT, secure architecture) and fintech platforms.",
   }, await getPage("services"));
 }
 
 export default async function ServicesPage() {
-  const [page, services] = await Promise.all([getPage("services"), getServices()]);
+  const [page, services, settings] = await Promise.all([getPage("services"), getServices(), getSettings()]);
   return (
     <>
       <PageHero
         eyebrow="Services"
         title={page?.title || "Engineering services built around your business"}
-        intro={page?.intro || "Eight specialist practices, one delivery standard. Pick a single service or combine them — we bring the same senior team, security discipline and transparent pricing to every engagement."}
+        intro={page?.intro || "Five specialist practices, one delivery standard. Pick a single service or combine them: the same senior team, security discipline and transparent pricing on every engagement."}
         crumbs={[{ href: "/services", label: "Services" }]}
       />
       <section className="section">
-        <div className="container-x grid gap-6 md:grid-cols-2">
-          {services.map((s) => (
-            <article key={s.slug} data-reveal className="card flex flex-col sm:flex-row sm:gap-6">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-navy text-gold">
-                <ServiceIcon name={s.icon} className="h-7 w-7" />
-              </span>
-              <div className="mt-4 flex flex-1 flex-col sm:mt-0">
-                <h2 className="text-xl font-semibold text-fg">{s.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-muted">{s.shortDescription}</p>
-                <ul className="mt-4 flex flex-wrap gap-2">
-                  {s.deliverables.slice(0, 4).map((d) => (
-                    <li key={d} className="rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg">{d}</li>
-                  ))}
-                </ul>
-                <Link href={`/services/${s.slug}`} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-link">
-                  Explore {s.title} <ArrowRight className="h-4 w-4" aria-hidden />
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+        <ol className="container-x space-y-24 lg:space-y-32">
+          {services.map((s, i) => {
+            const m = serviceModel(s.icon, settings);
+            return (
+              <li key={s.slug} className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                <div className={i % 2 ? "lg:order-2" : ""}>
+                  <TiltCard className="rounded-[2rem]">
+                    <Link href={`/services/${s.slug}`} data-cursor="View" aria-label={`${s.title}: view service`} className="block rounded-[2rem] border border-white/[0.07] bg-gradient-to-b from-white/[0.04] to-transparent">
+                      <ModelView model={m.model} url={m.url} alt={m.alt} className="h-80 sm:h-[26rem]" />
+                    </Link>
+                  </TiltCard>
+                </div>
+                <div>
+                  <p data-reveal className="font-display text-sm tracking-[0.25em] text-gold">{String(i + 1).padStart(2, "0")}</p>
+                  <h2 data-reveal className="h-section mt-4 text-ivory">{s.title}</h2>
+                  <p data-reveal className="lead mt-5">{s.shortDescription}</p>
+                  <ul data-reveal className="mt-6 space-y-2.5">
+                    {s.deliverables.slice(0, 4).map((d) => (
+                      <li key={d} className="flex gap-3 text-sm leading-6 text-ivory/90"><span className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 bg-gold" aria-hidden /> {d}</li>
+                    ))}
+                  </ul>
+                  <Link data-reveal href={`/services/${s.slug}`} className="btn-outline mt-8">
+                    Explore {s.title} <ArrowUpRight className="h-4 w-4" aria-hidden />
+                  </Link>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       </section>
-      <CtaBanner title="Not sure which service you need?" text="Describe the problem you are trying to solve. We will recommend the right approach — even if that means a smaller engagement than you expected." />
+      <GoldRule />
+      <CtaBanner title="Not sure which service you need?" text="Describe the problem you are trying to solve. We will recommend the right approach, even if that means a smaller engagement than you expected." />
     </>
   );
 }

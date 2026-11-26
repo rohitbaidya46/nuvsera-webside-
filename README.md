@@ -1,17 +1,21 @@
 # Nuvsera Technology — Corporate Website & Admin Panel
 
 Source code for **nuvseratechnology.com**, the website of **Nuvsera Technology Private Limited**
-(CIN U62013WB2025PTC283873 · GSTIN 19AAKCN9781A1Z2 · Udyam UDYAM-WB-10-0197639), the parent company of NS Exchange.
+(CIN U62013WB2025PTC283873 · GSTIN 19AAKCN9781A1Z2 · Udyam UDYAM-WB-10-0197639), the company that built and owns [NS Exchange](https://nsexchange.com).
+
+**Design:** "Royal Crest": private-bank luxury meets deep-tech. Dark (#0A0E16), gold (#E3A93B) and ivory, Cinzel / Cormorant Garamond / Inter, a fully 3D and animated public site.
 
 It contains:
 
-- **Public website**: Home, About, Services (overview + 8 detail pages), NS Exchange, Portfolio, Our Process, Careers (job list + application form), Insights/blog, Contact, a 4-step Get-a-Quote wizard, Privacy Policy, Terms & Conditions, Refund & Cancellation Policy, a thank-you page and a 404 page.
+- **Public website**: Home, About, Services (overview + 5 detail pages), NS Exchange, Portfolio, Our Process, Careers (job list + application form), Insights/blog, Contact, a 4-step Get-a-Quote wizard, Privacy Policy, Terms & Conditions, Cookie Policy, Refund & Cancellation Policy, a thank-you page and a 404 page.
+- **3D & motion**: React Three Fiber scenes (gold crest hero with a cinematic first-visit intro and bloom, glass blockchain blocks, circuit shield, devices, coin stack + chart hologram, technology orbit), GSAP ScrollTrigger pinned scenes and horizontal timeline, Lenis smooth scrolling, custom cursor, gold particle parallax, magnetic buttons, tilt cards, line-by-line text reveals, page transitions and a crest preloader. Three quality tiers with still-image fallbacks; reduced motion is respected. See [docs/3D_ASSETS.md](docs/3D_ASSETS.md) for Tripo AI prompts and how to upload GLB models.
 - **Lead capture**: a sticky "Get a Quote" button, WhatsApp and click-to-call buttons, a contact form with file upload, the quote wizard, a newsletter sign-up (double opt-in) and lead-source tracking (UTM parameters, gclid/gbraid/wbraid, li_fat_id, referrer, landing page). Every submission is saved, emailed to the team, and answered with an automatic thank-you email.
-- **Admin panel** (`/admin`): 2FA, 4 roles, dashboard, leads CRM, a CMS for every content type, media library, per-page SEO, settings, users, audit log and backups.
+- **Admin panel** (`/admin`): 2FA, 4 roles, dashboard (leads, cookieless visitor counts, top pages), leads CRM (form leads + WhatsApp/call click enquiries, CSV/Excel export), a CMS for every content type, media library (images and .glb 3D models), per-page SEO, settings (phone, emails, address, social links, 3D models in one place), users, audit log and backups.
 
 | | |
 |---|---|
 | Framework | Next.js 15 (App Router, server components, SSR) + TypeScript + Tailwind CSS 4 |
+| 3D & motion | three.js + React Three Fiber + drei + postprocessing, GSAP + ScrollTrigger, Lenis, Framer Motion |
 | Database | PostgreSQL 14+ with Prisma ORM 6 |
 | Auth | Custom session auth (bcrypt + DB-backed sessions + TOTP 2FA). See [Why not NextAuth?](#why-custom-auth-instead-of-nextauth) |
 | Email | SMTP via Nodemailer. Works with Amazon SES, Brevo, Zoho or Google Workspace |
@@ -278,14 +282,22 @@ src/app/(site)/       public pages
 src/app/admin/        admin login/2FA pages and (panel)/ authenticated screens
 src/app/api/          public form APIs, admin APIs, cron endpoints
 src/components/site/  header, footer, forms, consent manager, sections
+src/components/three/ 3D scenes, quality tiers, GLB loading (see docs/3D_ASSETS.md)
+src/components/experience/  smooth scroll, cursor, transitions, reveals, cookieless analytics
+public/images/3d/     still-image fallbacks for the 3D models (scripts/render-stills.mjs)
+public/draco/         self-hosted Draco decoder for compressed GLB models
 src/components/admin/ admin UI (generic content form, CRM, editor, media)
 src/lib/              auth, permissions, settings, storage, email, validation, backup, etc.
 src/lib/admin/resources.ts  declarative definitions of all CMS content types (add a field here → it appears in the admin)
-docs/                 ADMIN_GUIDE.md, TEST_CHECKLIST.md
+docs/                 ADMIN_GUIDE.md, TEST_CHECKLIST.md, 3D_ASSETS.md
 tests/smoke.ts        automated end-to-end smoke test
 ```
 
 ## 9. Known limitations / next steps
+
+- **Logo files**: the crest is drawn in code (`src/components/site/Logo.tsx`, `public/icon.svg`). When the official SVG/PNG logo files arrive, upload them in Admin → Media library and set *Logo* in Site settings, or replace those two files.
+- **Tripo AI models** are not included yet: the site uses the built-in coded models until GLBs are uploaded (docs/3D_ASSETS.md).
+- **Performance (measured locally, Lighthouse 12, production build, no GPU so 3D falls back to stills):** desktop Performance 100 / Accessibility 100 / Best Practices 100; mobile Performance 86, LCP 3.4 s simulated (0.3 s observed). SEO scores 100 once `SITE_INDEXABLE=true` on the live domain. Re-test on the live site with PageSpeed Insights.
 
 - **Bengali / Hindi language toggle** (optional in the brief) is **not implemented**. The structure supports adding `next-intl` with `/bn` and `/hi` routes later, but professionally translated copy is needed first.
 - Placeholder content (team, case studies, a draft blog post, a job) is **unpublished** by default. Statistics and testimonials stay hidden until real data is entered and approved.

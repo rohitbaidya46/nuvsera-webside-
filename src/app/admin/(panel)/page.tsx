@@ -43,6 +43,18 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const month = startOfDayIST(29);
   const since12w = startOfDayIST(7 * 12 - 1);
 
+  // Analytics rows are keyed by IST calendar date stored as UTC midnight.
+  const monthDay = new Date(month.getTime() + 330 * 60000);
+  const weekDay = new Date(week.getTime() + 330 * 60000);
+  const [visitors30, visitors7, views30, topPages, clicks] = await Promise.all([
+    prisma.visitorDaily.count({ where: { day: { gte: monthDay } } }),
+    prisma.visitorDaily.count({ where: { day: { gte: weekDay } } }),
+    prisma.pageViewDaily.aggregate({ where: { day: { gte: monthDay } }, _sum: { views: true } }),
+    prisma.pageViewDaily.groupBy({ by: ["path"], where: { day: { gte: monthDay } }, _sum: { views: true }, orderBy: { _sum: { views: "desc" } }, take: 8 }),
+    prisma.contactClick.groupBy({ by: ["channel"], where: { createdAt: { gte: month } }, _count: true }),
+  ]);
+  const clickCount = (c: string) => clicks.find((x) => x.channel === c)?._count ?? 0;
+
   const [cToday, cWeek, cMonth, total, won, byService, bySource, latest, weekly, services, dueReminders] = await Promise.all([
     prisma.lead.count({ where: { createdAt: { gte: today } } }),
     prisma.lead.count({ where: { createdAt: { gte: week } } }),
@@ -82,6 +94,24 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
         ))}
       </div>
+      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wider text-muted">Website — last 30 days</h2>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {[
+          ["Visitors (7 days)", visitors7, null],
+          ["Visitors (30 days)", visitors30, null],
+          ["Page views (30 days)", views30._sum.views ?? 0, null],
+          ["WhatsApp / call clicks", `${clickCount("whatsapp")} / ${clickCount("phone")}`, "/admin/leads/clicks"],
+        ].map(([l, v, h]) => {
+          const body = (<><p className="text-sm text-muted">{l}</p><p className="mt-1 text-3xl font-bold tabular-nums text-fg">{v}</p></>);
+          return h ? <Link key={l as string} href={h as string} className="rounded-xl border border-line bg-card p-5 hover:border-brand/40">{body}</Link> : <div key={l as string} className="rounded-xl border border-line bg-card p-5">{body}</div>;
+        })}
+      </div>
+      <p className="mt-2 text-xs text-muted">Cookieless and anonymous: unique visitors are counted per day with a hash that changes daily; Do-Not-Track and Global Privacy Control are honoured, so figures are a lower bound.</p>
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        <Panel title="Top pages (30 days)" className="lg:col-span-3"><BarList rows={topPages.map((p) => ({ label: p.path, value: p._sum.views ?? 0 }))} /></Panel>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wider text-muted">Pipeline</h2>
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <Panel title="Leads per week — last 12 weeks" className="lg:col-span-2"><WeeklyBars data={weeks} /></Panel>
         <Panel title="Follow-ups due">

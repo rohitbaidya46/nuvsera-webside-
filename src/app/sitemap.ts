@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = env.appUrl;
   const now = new Date();
-  const staticPaths = ["", "/about", "/services", "/products/ns-exchange", "/portfolio", "/process", "/careers", "/blog", "/contact", "/get-a-quote", "/privacy-policy", "/terms-and-conditions", "/refund-and-cancellation-policy"];
+  const staticPaths = ["", "/about", "/services", "/products/ns-exchange", "/portfolio", "/process", "/careers", "/blog", "/contact", "/get-a-quote", "/privacy-policy", "/terms-and-conditions", "/refund-and-cancellation-policy", "/cookie-policy"];
   const [noindex, services, posts, cases, jobs] = await Promise.all([
     prisma.page.findMany({ where: { noindex: true }, select: { slug: true } }),
     prisma.service.findMany({ where: { published: true, noindex: false }, select: { slug: true, updatedAt: true } }),

@@ -20,7 +20,7 @@ export function SettingsForm({ initial }: { initial: S }) {
 
   const upd = <K extends keyof S>(sec: K, key: string, v: unknown) => setS((p) => ({ ...p, [sec]: { ...(p[sec] as object), [key]: v } }));
 
-  const input = <K extends "company" | "social" | "tracking" | "email" | "hero">(sec: K, key: string, label: string, opts: { help?: string; type?: string; placeholder?: string } = {}) => {
+  const input = <K extends "company" | "social" | "tracking" | "email" | "hero" | "models">(sec: K, key: string, label: string, opts: { help?: string; type?: string; placeholder?: string } = {}) => {
     const id = `${sec}-${key}`;
     const err = errors[`${sec}.${key}`];
     return (
@@ -82,9 +82,11 @@ export function SettingsForm({ initial }: { initial: S }) {
 
       <Panel title="Contact details">
         <div className="grid gap-4 sm:grid-cols-2">
-          {input("company", "email", "Public email", { type: "email" })}
+          {input("company", "email", "General email (shown everywhere)", { type: "email" })}
+          {input("company", "supportEmail", "Support email", { type: "email" })}
+          {input("company", "projectsEmail", "Projects / technical email", { type: "email" })}
           {input("company", "phone", "Phone (display)")}
-          {input("company", "whatsapp", "WhatsApp number", { help: "Digits only with country code, e.g. 917872994746" })}
+          {input("company", "whatsapp", "WhatsApp number", { help: "Digits only with country code, e.g. 919734333355" })}
           {input("company", "businessHours", "Business hours")}
           {input("company", "addressLine1", "Address line 1")}
           {input("company", "addressLine2", "Address line 2")}
@@ -104,21 +106,25 @@ export function SettingsForm({ initial }: { initial: S }) {
 
       <Panel title="Home page hero">
         <div className="space-y-4">
-          {input("hero", "headline", "Main headline")}
+          {input("hero", "headline", "Main headline", { help: "The last three words are shown in gold italic." })}
           <div>
             <label className="field-label" htmlFor="hero-sub">Sub-headline</label>
             <textarea id="hero-sub" rows={3} className="field" value={s.hero.subheadline} onChange={(e) => upd("hero", "subheadline", e.target.value)} />
           </div>
-          <div>
-            <p className="field-label">Rotating headlines (shown after the main headline)</p>
-            {s.hero.rotating.map((h, i) => (
-              <div key={i} className="mb-2 flex gap-2">
-                <input aria-label={`Rotating headline ${i + 1}`} className="field" value={h} onChange={(e) => upd("hero", "rotating", s.hero.rotating.map((x, n) => (n === i ? e.target.value : x)))} />
-                <button type="button" className="rounded p-2 text-muted hover:text-red-600" aria-label="Remove" onClick={() => upd("hero", "rotating", s.hero.rotating.filter((_, n) => n !== i))}><X className="h-4 w-4" /></button>
-              </div>
-            ))}
-            {s.hero.rotating.length < 5 && <button type="button" className="btn-outline" onClick={() => upd("hero", "rotating", [...s.hero.rotating, ""])}><Plus className="h-4 w-4" /> Add headline</button>}
-          </div>
+        </div>
+      </Panel>
+
+      <Panel title="3D models (optional)">
+        <p className="mb-3 text-sm text-muted">
+          Upload a <strong>.glb</strong> file (Draco/Meshopt-compressed, under 1.5 MB) in Media library, then paste its URL here. Leave a field blank to use the
+          built-in 3D model. Visitors on low-power devices or with reduced motion always see a static image instead.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {input("models", "hero", "Hero emblem", { placeholder: "/media/…glb" })}
+          {input("models", "software", "Custom Software", { placeholder: "/media/…glb" })}
+          {input("models", "blockchain", "Blockchain", { placeholder: "/media/…glb" })}
+          {input("models", "security", "Cybersecurity", { placeholder: "/media/…glb" })}
+          {input("models", "exchange", "NS Exchange", { placeholder: "/media/…glb" })}
         </div>
       </Panel>
 

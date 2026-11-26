@@ -16,12 +16,14 @@ function buildCsp(nonce: string, isDev: boolean) {
   const hcaptcha = "https://hcaptcha.com https://*.hcaptcha.com";
   return [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${isDev ? "'unsafe-eval'" : ""} https: 'unsafe-inline'`,
+    // 'wasm-unsafe-eval' lets the self-hosted Draco/Meshopt decoders (3D models) compile WebAssembly; it does not allow JS eval.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval' ${isDev ? "'unsafe-eval'" : ""} https: 'unsafe-inline'`,
+    `worker-src 'self' blob:`,
     `style-src 'self' 'unsafe-inline' ${hcaptcha}`,
     `img-src 'self' data: blob: https:`,
     `font-src 'self' data:`,
     `connect-src 'self' ${google} ${linkedin} ${hcaptcha}${isDev ? " ws:" : ""}`,
-    `frame-src ${hcaptcha} https://td.doubleclick.net https://www.googletagmanager.com`,
+    `frame-src ${hcaptcha} https://td.doubleclick.net https://www.googletagmanager.com https://www.google.com`,
     `frame-ancestors 'none'`,
     `form-action 'self'`,
     `base-uri 'self'`,

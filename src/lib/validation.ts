@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BUDGET_OPTIONS, SERVICE_SLUGS, TIMELINE_OPTIONS } from "./constants";
+import { BUDGET_OPTIONS, TIMELINE_OPTIONS } from "./constants";
 
 const name = z.string().trim().min(2, "Please enter your name").max(100);
 const email = z.string().trim().toLowerCase().email("Please enter a valid email address").max(200);
@@ -20,7 +20,8 @@ export const contactSchema = z.object({
   company: optional(150),
   email,
   phone,
-  service: z.enum(SERVICE_SLUGS, { errorMap: () => ({ message: "Please choose a service" }) }),
+  // Any service slug (services are managed in the admin panel); the API checks it exists.
+  service: z.string({ required_error: "Please choose a service" }).trim().regex(/^[a-z0-9-]{2,80}$/, "Please choose a service"),
   budget: z.enum(BUDGET_OPTIONS, { errorMap: () => ({ message: "Please choose a budget range" }) }),
   timeline: z.enum(TIMELINE_OPTIONS, { errorMap: () => ({ message: "Please choose a timeline" }) }),
   message: z.string().trim().min(10, "Please tell us a little about your project (10+ characters)").max(5000),

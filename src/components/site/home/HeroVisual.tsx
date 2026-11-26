@@ -1,44 +1,98 @@
-import { CheckCircle2, Lock, TrendingUp } from "lucide-react";
+"use client";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+import { loadGsap } from "@/components/experience/gsap";
+import { LogoMark } from "@/components/site/Logo";
+import { getQuality, intro, introTime, scroll, skipIntro, startIntro, type Quality } from "@/components/three/state";
 
-/** Decorative, original CSS illustration — an abstract product dashboard. Hidden from assistive tech. */
-export function HeroVisual() {
-  const bars = [38, 62, 48, 75, 58, 88, 70, 95, 80];
+const HeroCanvas = dynamic(() => import("@/components/three/HeroCanvas"), { ssr: false });
+
+/**
+ * Hero background: the 3D gold crest (tilts toward the mouse, idles with a slow spin, rotates away as you
+ * scroll) over a field of gold dust. Until WebGL is ready — or permanently for reduced motion / low-power
+ * devices — a crisp vector crest is shown in the same place.
+ */
+export function HeroVisual({ modelUrl, cinematic = false }: { modelUrl?: string; cinematic?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [quality, setQuality] = useState<Quality | null>(null);
+  const [ready, setReady] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const playIntro = useRef(false);
+
+  useEffect(() => {
+    const q = getQuality();
+    if (q === "off") return;
+    // The cinematic intro plays once per visit, on the home page only.
+    try {
+      playIntro.current = cinematic && !sessionStorage.getItem("nv_intro");
+      if (playIntro.current) sessionStorage.setItem("nv_intro", "1");
+    } catch {
+      playIntro.current = false;
+    }
+    const id = window.setTimeout(() => setQuality(q), playIntro.current ? 0 : 250);
+    return () => window.clearTimeout(id);
+  }, [cinematic]);
+
+  // Any scroll, key press or tap skips the intro; it also ends by itself.
+  useEffect(() => {
+    if (!playing) return;
+    const skip = () => skipIntro();
+    const opts = { passive: true, once: true } as const;
+    addEventListener("wheel", skip, opts);
+    addEventListener("touchmove", skip, opts);
+    addEventListener("keydown", skip, { once: true });
+    const id = window.setInterval(() => !Number.isFinite(introTime()) && setPlaying(false), 200);
+    return () => {
+      removeEventListener("wheel", skip);
+      removeEventListener("touchmove", skip);
+      removeEventListener("keydown", skip);
+      window.clearInterval(id);
+    };
+  }, [playing]);
+
+  const onReady = () => {
+    if (playIntro.current) {
+      startIntro();
+      setPlaying(true);
+    }
+    window.setTimeout(() => setReady(true), playIntro.current ? 0 : 150);
+  };
+
+  useEffect(() => {
+    const section = ref.current?.closest("section");
+    if (!section) return;
+    let dead = false;
+    let kill = () => {};
+    loadGsap().then(({ ScrollTrigger }) => {
+      if (dead) return;
+      const st = ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom top", scrub: true, onUpdate: (s) => (scroll.hero = s.progress) });
+      kill = () => st.kill();
+    });
+    return () => {
+      dead = true;
+      kill();
+      scroll.hero = 0;
+    };
+  }, []);
+
   return (
-    <div aria-hidden="true" className="relative mx-auto w-full max-w-md select-none lg:max-w-none">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-2xl backdrop-blur">
-        <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-white/25" /><span className="h-2.5 w-2.5 rounded-full bg-white/25" /><span className="h-2.5 w-2.5 rounded-full bg-white/25" />
-          <span className="ml-3 h-2 w-32 rounded bg-white/15" />
-        </div>
-        <div className="mt-5 grid grid-cols-3 gap-3">
-          {["Uptime", "Releases", "Open issues"].map((l, n) => (
-            <div key={l} className="rounded-xl bg-white/[0.07] p-3">
-              <div className="text-[11px] text-slate-400">{l}</div>
-              <div className="mt-2 h-2.5 rounded bg-white/25" style={{ width: `${[70, 50, 35][n]}%` }} />
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 rounded-xl bg-white/[0.07] p-4">
-          <div className="flex items-center justify-between text-[11px] text-slate-400"><span>Throughput</span><TrendingUp className="h-3.5 w-3.5 text-gold" /></div>
-          <div className="mt-3 flex h-28 items-end gap-2">
-            {bars.map((h, n) => <div key={n} className={`flex-1 rounded-t ${n === bars.length - 2 ? "bg-gold" : "bg-brand/70"}`} style={{ height: `${h}%` }} />)}
-          </div>
-        </div>
-        <div className="mt-4 space-y-2">
-          {[64, 82, 48].map((w, n) => (
-            <div key={n} className="flex items-center gap-3 rounded-lg bg-white/[0.05] px-3 py-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
-              <span className="h-2 rounded bg-white/20" style={{ width: `${w}%` }} />
-            </div>
-          ))}
+    <div ref={ref} className="absolute inset-0">
+      <div aria-hidden className={`absolute inset-0 transition-opacity duration-[1600ms] ${ready ? "opacity-0" : "opacity-100"}`}>
+        <div className="absolute left-1/2 top-[22%] -translate-x-1/2 -translate-y-1/2 lg:left-[72%] lg:top-1/2">
+          <div className="absolute inset-0 -m-16 rounded-full bg-gold/10 blur-3xl" />
+          <LogoMark className="relative h-56 w-56 drop-shadow-[0_20px_60px_rgba(227,169,59,0.35)] sm:h-72 sm:w-72 lg:h-[26rem] lg:w-[26rem]" />
         </div>
       </div>
-      <div className="absolute -left-4 bottom-10 hidden items-center gap-2 rounded-xl border border-white/10 bg-navy-800 px-3.5 py-2.5 text-xs font-medium text-white shadow-xl sm:flex">
-        <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Security review passed
-      </div>
-      <div className="absolute -right-3 top-12 hidden items-center gap-2 rounded-xl border border-white/10 bg-navy-800 px-3.5 py-2.5 text-xs font-medium text-white shadow-xl sm:flex">
-        <Lock className="h-4 w-4 text-gold" /> Encrypted at rest
-      </div>
+      {quality && <HeroCanvas quality={quality} url={modelUrl} onReady={onReady} />}
+      {playing && intro.active && (
+        <button
+          type="button"
+          onClick={() => skipIntro()}
+          className="absolute bottom-24 right-6 z-20 rounded-full border border-ivory/20 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-ivory/70 transition hover:border-gold hover:text-gold lg:bottom-10 lg:right-24"
+        >
+          Skip intro
+        </button>
+      )}
     </div>
   );
 }

@@ -1,36 +1,41 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { GoldRule, SplitText } from "@/components/experience/SplitText";
 import { JsonLd } from "./JsonLd";
 import { env } from "@/lib/env";
 
 type Crumb = { href: string; label: string };
 
-export function PageHero({ eyebrow, title, intro, crumbs = [], children }: { eyebrow?: string; title: string; intro?: string | null; crumbs?: Crumb[]; children?: React.ReactNode }) {
+export function PageHero({ eyebrow, title, intro, crumbs = [], children, aside }: { eyebrow?: string; title: string; intro?: string | null; crumbs?: Crumb[]; children?: React.ReactNode; aside?: React.ReactNode }) {
   const all = [{ href: "/", label: "Home" }, ...crumbs];
   return (
-    <section className="relative overflow-hidden bg-navy text-white">
-      <div className="bg-grid absolute inset-0" aria-hidden />
-      <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand/25 blur-3xl" aria-hidden />
-      <div className="container-x relative py-14 sm:py-20">
-        <nav aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-1 text-sm text-slate-300">
-            {all.map((c, i) => (
-              <li key={c.href} className="flex items-center gap-1">
-                {i > 0 && <ChevronRight className="h-3.5 w-3.5" aria-hidden />}
-                {i === all.length - 1 ? (
-                  <span aria-current="page" className="text-white">{c.label}</span>
-                ) : (
-                  <Link href={c.href} className="hover:text-white hover:underline">{c.label}</Link>
-                )}
-              </li>
-            ))}
-          </ol>
-        </nav>
-        {eyebrow && <p className="mt-8 text-sm font-semibold uppercase tracking-[0.14em] text-gold">{eyebrow}</p>}
-        <h1 className={`${eyebrow ? "mt-3" : "mt-8"} max-w-4xl text-4xl font-bold tracking-tight text-balance sm:text-5xl`}>{title}</h1>
-        {intro && <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300 text-pretty">{intro}</p>}
-        {children}
+    <section className="relative overflow-hidden">
+      <div className="bg-vignette absolute inset-0" aria-hidden />
+      <div className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" aria-hidden />
+      <div className={`container-x relative grid items-center gap-10 py-16 sm:py-24 ${aside ? "lg:grid-cols-[1.2fr_1fr]" : ""}`}>
+        <div>
+          <nav aria-label="Breadcrumb">
+            <ol className="flex flex-wrap items-center gap-1 text-xs uppercase tracking-[0.2em] text-muted">
+              {all.map((c, i) => (
+                <li key={c.href} className="flex items-center gap-1">
+                  {i > 0 && <ChevronRight className="h-3 w-3" aria-hidden />}
+                  {i === all.length - 1 ? (
+                    <span aria-current="page" className="text-gold">{c.label}</span>
+                  ) : (
+                    <Link href={c.href} className="hover:text-ivory">{c.label}</Link>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+          {eyebrow && <p className="eyebrow mt-10">{eyebrow}</p>}
+          <SplitText as="h1" text={title} className={`${eyebrow ? "mt-5" : "mt-10"} h-display max-w-4xl text-ivory`} />
+          {intro && <p data-reveal style={{ ["--reveal-delay" as string]: "200ms" }} className="mt-6 max-w-3xl text-lg leading-8 text-muted text-pretty">{intro}</p>}
+          {children && <div data-reveal style={{ ["--reveal-delay" as string]: "300ms" }}>{children}</div>}
+        </div>
+        {aside}
       </div>
+      <GoldRule />
       <JsonLd
         data={{
           "@context": "https://schema.org",

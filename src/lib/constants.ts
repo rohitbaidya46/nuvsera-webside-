@@ -19,7 +19,7 @@ export const LEAD_STATUSES = ["NEW", "CONTACTED", "PROPOSAL_SENT", "WON", "LOST"
 export const LEAD_STATUS_LABELS: Record<(typeof LEAD_STATUSES)[number], string> = {
   NEW: "New",
   CONTACTED: "Contacted",
-  PROPOSAL_SENT: "Proposal Sent",
+  PROPOSAL_SENT: "Quoted",
   WON: "Won",
   LOST: "Lost",
 };
@@ -29,14 +29,23 @@ export const APPLICATION_STATUSES = ["NEW", "REVIEWING", "SHORTLISTED", "REJECTE
 export const CONSENT_VERSION = "2026-11";
 export const CONSENT_COOKIE = "nv_consent";
 
-/** Canonical list of the eight services (used for form validation; content lives in the database). */
+/** The five services seeded by default (content lives in the database and can be extended in the admin panel). */
 export const SERVICE_SLUGS = [
-  "software-development",
-  "web-development",
-  "mobile-app-development",
-  "blockchain-solutions",
-  "crypto-exchange-development",
-  "ai-integration",
-  "cybersecurity-audit",
-  "data-analytics",
+  "custom-software-development",
+  "blockchain-crypto-exchange-development",
+  "smart-contracts-wallets",
+  "cybersecurity",
+  "fintech-platforms",
 ] as const;
+
+/** Earlier service URLs (before the five-service structure), redirected permanently to their closest successor. */
+export const LEGACY_SERVICE_REDIRECTS: Record<string, string> = {
+  "software-development": "custom-software-development",
+  "web-development": "custom-software-development",
+  "mobile-app-development": "custom-software-development",
+  "ai-integration": "custom-software-development",
+  "data-analytics": "custom-software-development",
+  "blockchain-solutions": "smart-contracts-wallets",
+  "crypto-exchange-development": "blockchain-crypto-exchange-development",
+  "cybersecurity-audit": "cybersecurity",
+};

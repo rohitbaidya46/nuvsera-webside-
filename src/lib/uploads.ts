@@ -3,6 +3,14 @@ import { HttpError } from "./http";
 
 export const MAX_DOC_BYTES = 10 * 1024 * 1024;
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+export const MAX_MODEL_BYTES = 15 * 1024 * 1024;
+/** Recommended ceiling for a web-ready (Draco/Meshopt-compressed) model. */
+export const RECOMMENDED_MODEL_BYTES = 1.5 * 1024 * 1024;
+
+/** A binary glTF 2.0 file starts with the ASCII magic "glTF" followed by version 2 (little-endian uint32). */
+export function isGlb(b: Buffer) {
+  return b.length >= 20 && b.subarray(0, 4).toString("latin1") === "glTF" && b.readUInt32LE(4) === 2 && b.readUInt32LE(8) === b.length;
+}
 
 const DOC_TYPES: Record<string, { ext: string; mime: string; check: (b: Buffer) => boolean }> = {
   pdf: { ext: "pdf", mime: "application/pdf", check: (b) => b.subarray(0, 5).toString("latin1") === "%PDF-" },
@@ -39,7 +47,7 @@ export function storageKey(prefix: string, ext: string) {
 
 export function mimeForExt(ext: string) {
   return (
-    { pdf: "application/pdf", doc: "application/msword", docx: DOC_TYPES.docx.mime, webp: "image/webp", svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg", json: "application/json", gz: "application/gzip" }[ext] ||
+    { pdf: "application/pdf", doc: "application/msword", docx: DOC_TYPES.docx.mime, webp: "image/webp", svg: "image/svg+xml", png: "image/png", glb: "model/gltf-binary", jpg: "image/jpeg", json: "application/json", gz: "application/gzip" }[ext] ||
     "application/octet-stream"
   );
 }
