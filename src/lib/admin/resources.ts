@@ -40,6 +40,9 @@ const SERVICE_OPTIONS = [
   ["smart-contracts-wallets", "Smart Contracts & Wallets"],
   ["cybersecurity", "Cybersecurity"],
   ["fintech-platforms", "Fintech Platforms"],
+  ["coin-listing", "Coin Listing"],
+  ["coin-audit", "Coin Audit"],
+  ["smart-contract-audit", "Smart Contract Audit"],
 ].map(([value, label]) => ({ value, label }));
 
 export const SEO_FIELDS: Field[] = [
@@ -88,7 +91,7 @@ export const RESOURCES: Resource[] = [
       { name: "shortDescription", label: "One-line description", type: "textarea", required: true, max: 300 },
       {
         name: "icon", label: "Icon", type: "select", required: true,
-        options: ["code", "globe", "smartphone", "blocks", "exchange", "wallet", "landmark", "bot", "shield", "chart"].map((v) => ({ value: v, label: v })),
+        options: ["code", "globe", "smartphone", "blocks", "exchange", "wallet", "landmark", "listing", "scan", "filecode", "bot", "shield", "chart"].map((v) => ({ value: v, label: v })),
         group: "side",
       },
       { name: "overview", label: "Overview", type: "richtext", required: true },

@@ -168,4 +168,98 @@ export const SERVICES: Seed[] = [
       { question: "Can you take over an existing fintech codebase?", answer: "Yes. We start with a code and security review, then stabilise and extend the platform." },
     ],
   },
+  {
+    slug: "coin-listing",
+    title: "Coin Listing",
+    icon: "listing",
+    shortDescription: "Exchange-ready token preparation and listing support: technical integration, documentation and due-diligence packs, including listing on NS Exchange.",
+    overview: `<p>Getting a coin or token listed is as much about preparation as it is about code. Exchanges and data aggregators ask for a working, verified contract, clear tokenomics, legal and KYC documents, liquidity plans and reliable technical integration. We prepare all of it with you, so your application is complete the first time.</p>
+<p>For <a href="https://nsexchange.com" rel="noopener">NS Exchange</a>, the exchange built and owned by Nuvsera, we handle the full technical integration: deposits and withdrawals, wallet and node set-up, market creation and monitoring. For other exchanges and aggregators we prepare the technical and documentation pack and support you through their process.</p>
+<h3>Important</h3>
+<p>Every exchange makes its own independent listing decision after its own due diligence. We do not and cannot guarantee a listing, a price or trading volume. Listing on NS Exchange is also subject to NS Exchange’s due-diligence and compliance review.</p>`,
+    deliverables: [
+      "Listing-readiness review of your token, contract and documentation",
+      "Verified contract source and token metadata on block explorers",
+      "Exchange integration: deposit/withdrawal, node and wallet set-up",
+      "Listing application pack: technical sheet, tokenomics, team and legal documents",
+      "Listing support for NS Exchange, subject to its due diligence",
+      "Post-listing monitoring of deposits, withdrawals and market health",
+    ],
+    techStack: ["Solidity", "EVM chains", "BNB Chain", "Polygon", "Tron (TRC-20)", "Node operations", "Etherscan / BscScan verification", "REST & WebSocket APIs"],
+    process: [
+      { title: "Discover", description: "Review the token, contract, chain, supply and target exchanges." },
+      { title: "Design", description: "Close the gaps: verification, metadata, documentation and liquidity plan." },
+      { title: "Build", description: "Technical integration with the exchange: nodes, wallets and confirmations." },
+      { title: "Secure", description: "Contract and integration checks before deposits are opened." },
+      { title: "Launch", description: "Market opening on the exchange and post-listing monitoring." },
+    ],
+    faqs: [
+      { question: "Can you guarantee a listing?", answer: "No. Every exchange, including NS Exchange, makes its own listing decision after due diligence. We prepare a complete, technically sound application and handle integration once a listing is approved." },
+      { question: "Which chains do you support?", answer: "Ethereum and EVM-compatible chains such as BNB Chain, Polygon, Arbitrum and Base, and TRC-20 tokens on Tron. Ask us about others." },
+      { question: "Do I need an audit before listing?", answer: "Most reputable exchanges expect a security review of the token contract. We recommend our Coin Audit or Smart Contract Audit service before applying." },
+      { question: "Do you provide market making or liquidity?", answer: "No. We can integrate with your chosen market-making partner’s APIs, but we do not provide liquidity or trade on your behalf." },
+    ],
+  },
+  {
+    slug: "coin-audit",
+    title: "Coin Audit",
+    icon: "scan",
+    shortDescription: "Independent review of a coin or token: contract security, ownership and admin powers, supply and tokenomics, and on-chain holder concentration.",
+    overview: `<p>Before you list, invest in or integrate a token, you need to know what its contract can actually do. Our Coin Audit looks beyond the whitepaper at the deployed contract and its on-chain reality.</p>
+<p>We check the contract for known vulnerability classes and for powers that put holders at risk: minting, pausing, blacklisting, fee changes, upgradeability and who controls them. We compare the stated tokenomics with the actual supply, vesting and holder distribution on-chain, and deliver a clear, risk-rated report with recommendations.</p>
+<p>Send us the <strong>contract address and blockchain</strong> using the audit request form on this page to receive a scope and quote.</p>`,
+    deliverables: [
+      "Contract security review against known vulnerability classes",
+      "Owner/admin powers analysis: mint, pause, blacklist, fees, upgrades",
+      "Tokenomics check: stated vs on-chain supply, vesting and locks",
+      "Holder concentration and liquidity-lock review",
+      "Risk-rated report with clear recommendations",
+      "Re-check after fixes and a shareable summary",
+    ],
+    techStack: ["Solidity", "Slither", "Foundry", "Mythril", "Etherscan / BscScan", "Dune / on-chain analytics", "EVM chains", "Tron"],
+    process: [
+      { title: "Discover", description: "Share the contract address, chain and whitepaper; we agree scope and timeline." },
+      { title: "Design", description: "Map the contract’s roles, privileged functions and token flows." },
+      { title: "Build", description: "Automated analysis plus manual line-by-line review and on-chain checks." },
+      { title: "Secure", description: "Risk-rated findings with evidence and recommended fixes." },
+      { title: "Launch", description: "Re-check after fixes and a final report you can share." },
+    ],
+    faqs: [
+      { question: "What do I need to send?", answer: "The contract address and the blockchain it is deployed on, plus your whitepaper or tokenomics if available. Verified source code on the explorer speeds things up." },
+      { question: "Is an audit a guarantee that a token is safe?", answer: "No audit can guarantee the absence of all issues. The report describes what we reviewed, what we found and the residual risks, as of the audited version." },
+      { question: "How long does it take?", answer: "A typical single-token audit takes three to seven working days depending on contract size and complexity." },
+      { question: "Can we publish the report?", answer: "Yes, once fixes are verified you may publish the final report or its summary." },
+    ],
+  },
+  {
+    slug: "smart-contract-audit",
+    title: "Smart Contract Audit",
+    icon: "filecode",
+    shortDescription: "Line-by-line security audit of smart contracts by address or repository: vulnerabilities, access control, upgrade safety and gas, with a re-test of fixes.",
+    overview: `<p>Smart contracts hold real value and cannot easily be changed once deployed. Our audits combine automated analysis with careful manual review by engineers who build contracts themselves, including for <a href="https://nsexchange.com" rel="noopener">NS Exchange</a>.</p>
+<p>We audit contracts already deployed (send us the <strong>contract address and chain</strong>) or code before deployment (share the repository and commit). The review covers reentrancy, access control, oracle and price manipulation, upgradeability and storage layout, signature handling, integer and rounding issues, and gas efficiency.</p>
+<p>You receive a risk-rated report with proof-of-concept tests for significant findings, then a free re-test once you have fixed them.</p>`,
+    deliverables: [
+      "Manual line-by-line review plus static and fuzz analysis",
+      "Access control, upgradeability and storage-layout review",
+      "Oracle, price-manipulation and economic attack review",
+      "Proof-of-concept tests for significant findings",
+      "Risk-rated report with remediation guidance",
+      "Free re-test of fixed findings and a final report",
+    ],
+    techStack: ["Solidity", "Vyper", "Foundry", "Hardhat", "Slither", "Echidna", "Mythril", "OpenZeppelin", "EVM chains"],
+    process: [
+      { title: "Discover", description: "Contract address and chain, or repository and commit; we agree scope and timeline." },
+      { title: "Design", description: "Threat model: roles, assets, trust assumptions and external dependencies." },
+      { title: "Build", description: "Manual review, automated analysis, fuzzing and proof-of-concept tests." },
+      { title: "Secure", description: "Report with severity-rated findings and recommended fixes." },
+      { title: "Launch", description: "Re-test of fixes and a final report ready to publish." },
+    ],
+    faqs: [
+      { question: "Can you audit a contract that is already deployed?", answer: "Yes. Send us the contract address and the chain. Verified source code on the block explorer is needed; if it is not verified, share the source and we will confirm it matches the deployed bytecode." },
+      { question: "Which languages and chains?", answer: "Solidity and Vyper on Ethereum and EVM-compatible chains (BNB Chain, Polygon, Arbitrum, Base and others)." },
+      { question: "Is an audit a guarantee?", answer: "No. An audit reduces risk significantly but cannot prove the absence of all bugs. We recommend audits before every major release and monitoring after deployment." },
+      { question: "How is pricing decided?", answer: "By contract size and complexity (lines of code, external integrations, upgradeability). You receive a fixed quote after scoping." },
+    ],
+  },
 ];

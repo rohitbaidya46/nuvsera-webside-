@@ -25,6 +25,8 @@ export async function sendLeadEmails(lead: Lead) {
     ["Service", svc],
     ["Budget", lead.budget],
     ["Timeline", lead.timeline],
+    ["Blockchain", details.chain as string],
+    ["Contract address", details.contractAddress as string],
     ["Project type", details.projectType as string],
     ["Platforms", Array.isArray(details.platforms) ? (details.platforms as string[]).join(", ") : null],
     ["Preferred contact", details.preferredContact as string],

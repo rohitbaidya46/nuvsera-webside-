@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { LEGACY_SERVICE_REDIRECTS } from "@/lib/constants";
+import { CONTRACT_SERVICES, LEGACY_SERVICE_REDIRECTS } from "@/lib/constants";
+import { ContactForm } from "@/components/site/forms/ContactForm";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { CtaBanner } from "@/components/site/CtaBanner";
 import { FaqList } from "@/components/site/FaqList";
@@ -44,7 +45,11 @@ export default async function ServiceDetail({ params }: Props) {
         aside={<ModelView model={m.model} url={m.url} alt={m.alt} className="h-72 sm:h-96 lg:h-[30rem]" />}
       >
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link href={`/get-a-quote?service=${s.slug}`} className="btn-gold">Start a Project</Link>
+          {CONTRACT_SERVICES.includes(s.slug) ? (
+            <a href="#request" className="btn-gold">{s.slug === "coin-listing" ? "Request listing support" : "Request an audit"}</a>
+          ) : (
+            <Link href={`/get-a-quote?service=${s.slug}`} className="btn-gold">Start a Project</Link>
+          )}
           <Link href={`/contact?service=${s.slug}`} className="btn-ghost-light">Talk to an engineer</Link>
         </div>
       </PageHero>
@@ -96,6 +101,22 @@ export default async function ServiceDetail({ params }: Props) {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+      )}
+
+      {CONTRACT_SERVICES.includes(s.slug) && (
+        <section id="request" className="section" aria-labelledby="request-heading">
+          <div className="container-x grid gap-12 lg:grid-cols-[1fr_1.4fr]">
+            <SectionHeading
+              id="request-heading"
+              eyebrow={s.slug === "coin-listing" ? "Listing request" : "Audit request"}
+              title={s.slug === "coin-listing" ? "Tell us about your coin" : "Send us the contract"}
+              intro="Share the blockchain and contract address (if already deployed). A senior engineer reviews it and replies within one business day with scope, timeline and a fixed quote. Never send private keys or seed phrases."
+            />
+            <div className="card sm:p-8">
+              <ContactForm services={all.map((o) => ({ slug: o.slug, title: o.title }))} defaultService={s.slug} />
+            </div>
           </div>
         </section>
       )}

@@ -36,6 +36,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
     ["Service", service?.title ?? lead.service ?? "—"],
     ["Budget", lead.budget ?? "—"],
     ["Timeline", lead.timeline ?? "—"],
+    ...(d.contractAddress || d.chain ? ([["Blockchain", String(d.chain ?? "—")], ["Contract address", <code key="ca" className="break-all text-xs">{String(d.contractAddress ?? "—")}</code>]] as [string, React.ReactNode][]) : []),
     ...(lead.type === "QUOTE"
       ? ([["Project type", String(d.projectType ?? "—")], ["Platforms", Array.isArray(d.platforms) ? (d.platforms as string[]).join(", ") || "—" : "—"], ["Designs ready", String(d.hasDesigns ?? "—")], ["Preferred contact", String(d.preferredContact ?? "—")]] as [string, string][])
       : []),

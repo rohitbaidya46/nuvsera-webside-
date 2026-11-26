@@ -1,13 +1,15 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Send } from "lucide-react";
-import { BUDGET_OPTIONS, TIMELINE_OPTIONS } from "@/lib/constants";
+import { AUDIT_CHAINS, BUDGET_OPTIONS, CONTRACT_SERVICES, TIMELINE_OPTIONS } from "@/lib/constants";
 import { Captcha, type CaptchaHandle } from "./Captcha";
 import { ConsentCheckbox, FileField, FormAlert, Honeypot, SelectField, TextArea, TextField } from "./Fields";
 import { useFormSubmit } from "./useFormSubmit";
 
 export function ContactForm({ services, defaultService }: { services: { slug: string; title: string }[]; defaultService?: string }) {
   const { submit, pending, errors, message } = useFormSubmit("/api/leads");
+  const [service, setService] = useState(defaultService ?? "");
+  const needsContract = CONTRACT_SERVICES.includes(service);
   const captcha = useRef<CaptchaHandle>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -41,7 +43,14 @@ export function ContactForm({ services, defaultService }: { services: { slug: st
         defaultValue={defaultService}
         options={services.map((s) => ({ value: s.slug, label: s.title }))}
         error={errors.service}
+        onChange={setService}
       />
+      {needsContract && (
+        <div className="grid gap-5 rounded-2xl border border-gold/25 bg-gold/[0.03] p-4 sm:grid-cols-[1fr_2fr]">
+          <SelectField name="chain" label="Blockchain" options={AUDIT_CHAINS.map((c) => ({ value: c, label: c }))} error={errors.chain} />
+          <TextField name="contractAddress" label="Contract address (if deployed)" placeholder="0x… or T…" autoComplete="off" error={errors.contractAddress} />
+        </div>
+      )}
       <div className="grid gap-5 sm:grid-cols-2">
         <SelectField name="budget" label="Budget range" required options={BUDGET_OPTIONS.map((b) => ({ value: b, label: b }))} error={errors.budget} />
         <SelectField name="timeline" label="Timeline" required options={TIMELINE_OPTIONS.map((t) => ({ value: t, label: t }))} error={errors.timeline} />

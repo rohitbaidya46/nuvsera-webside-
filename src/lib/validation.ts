@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BUDGET_OPTIONS, TIMELINE_OPTIONS } from "./constants";
+import { AUDIT_CHAINS, BUDGET_OPTIONS, TIMELINE_OPTIONS } from "./constants";
 
 const name = z.string().trim().min(2, "Please enter your name").max(100);
 const email = z.string().trim().toLowerCase().email("Please enter a valid email address").max(200);
@@ -26,6 +26,14 @@ export const contactSchema = z.object({
   timeline: z.enum(TIMELINE_OPTIONS, { errorMap: () => ({ message: "Please choose a timeline" }) }),
   message: z.string().trim().min(10, "Please tell us a little about your project (10+ characters)").max(5000),
   consent: consentField,
+  // Audit / listing requests: the contract to review. EVM (0x + 40 hex), Tron (T…, 34 chars) or Solana (base58, 32–44).
+  chain: z.enum(AUDIT_CHAINS).optional().or(z.literal("").transform(() => undefined)),
+  contractAddress: z
+    .string()
+    .trim()
+    .max(100)
+    .regex(/^(0x[a-fA-F0-9]{40}|T[1-9A-HJ-NP-Za-km-z]{33}|[1-9A-HJ-NP-Za-km-z]{32,44})?$/, "Enter a valid contract address (e.g. 0x… for EVM chains, T… for Tron)")
+    .optional(),
 });
 
 export const quoteSchema = contactSchema.extend({
