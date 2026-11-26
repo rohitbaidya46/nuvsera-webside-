@@ -13,6 +13,9 @@ const BY_ICON: Record<string, Exclude<ModelKey, "hero" | "orbit">> = {
   wallet: "blockchain",
   shield: "security",
   landmark: "exchange",
+  listing: "exchange",
+  scan: "security",
+  filecode: "blockchain",
 };
 
 const ALT: Record<string, string> = {

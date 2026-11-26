@@ -9,6 +9,7 @@ import { GoldRule, SplitText } from "@/components/experience/SplitText";
 import { TiltCard } from "@/components/experience/TiltCard";
 import { CtaBanner } from "@/components/site/CtaBanner";
 import { SectionHeading } from "@/components/site/SectionHeading";
+import { FilmPlayer } from "@/components/site/home/FilmPlayer";
 import { HeroVisual } from "@/components/site/home/HeroVisual";
 import { PinnedScene } from "@/components/site/home/PinnedScene";
 import { ProcessScroller } from "@/components/site/home/ProcessScroller";
@@ -130,6 +131,37 @@ export default async function HomePage() {
               ))}
             </ul>
           )}
+        </div>
+      </section>
+
+      {/* Demo presentation: the brand film */}
+      <section className="section relative" aria-labelledby="film-heading">
+        <div className="bg-vignette absolute inset-0" aria-hidden />
+        <div className="container-x relative">
+          <div className="grid items-end gap-8 lg:grid-cols-[1.2fr_1fr]">
+            <div>
+              <p data-reveal className="eyebrow">Demo presentation</p>
+              <SplitText id="film-heading" text="See Nuvsera in motion." className="h-section mt-5 text-ivory" />
+            </div>
+            <p data-reveal className="lead">
+              A short film rendered from the same 3D scenes you see on this site: the crest, blockchain infrastructure, security, custom software and NS Exchange.
+            </p>
+          </div>
+          <div data-reveal className="mt-12">
+            <FilmPlayer
+              src="/video/nuvsera-film.mp4"
+              poster="/video/nuvsera-film-poster.webp"
+              title="Nuvsera Technology brand film"
+              chapters={[
+                { t: 0, label: "The crest" },
+                { t: 6.8, label: "Blockchain" },
+                { t: 10.4, label: "Cybersecurity" },
+                { t: 14.0, label: "Custom software" },
+                { t: 17.6, label: "NS Exchange" },
+                { t: 21.4, label: "Get in touch" },
+              ]}
+            />
+          </div>
         </div>
       </section>
 

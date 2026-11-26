@@ -58,7 +58,7 @@ export function TextArea(props: Base & { rows?: number; placeholder?: string; de
   );
 }
 
-export function SelectField(props: Base & { options: { value: string; label: string }[]; defaultValue?: string; placeholder?: string }) {
+export function SelectField(props: Base & { options: { value: string; label: string }[]; defaultValue?: string; placeholder?: string; onChange?: (value: string) => void }) {
   const id = useId();
   return (
     <Wrap id={id} {...props}>
@@ -70,6 +70,7 @@ export function SelectField(props: Base & { options: { value: string; label: str
         aria-describedby={props.error ? `${id}-err` : undefined}
         className="field"
         defaultValue={props.defaultValue ?? ""}
+        onChange={props.onChange ? (e) => props.onChange!(e.target.value) : undefined}
       >
         <option value="" disabled>{props.placeholder ?? "Please select"}</option>
         {props.options.map((o) => (

@@ -56,7 +56,9 @@ export const POST = route(async (req: Request) => {
         hasDesigns: quote.hasDesigns ?? null,
         preferredContact: quote.preferredContact,
       }
-    : undefined;
+    : data.contractAddress || data.chain
+      ? { chain: data.chain ?? null, contractAddress: data.contractAddress || null }
+      : undefined;
 
   const lead = await prisma.lead.create({
     data: {

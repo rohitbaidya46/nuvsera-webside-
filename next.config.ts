@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // NEXT_OUTPUT=standalone is set by the Dockerfile; Vercel uses its own output.
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
+  // Lets a second dev server run beside a production build (e.g. NEXT_DIST_DIR=.next-dev npm run dev -- -p 3001).
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   reactStrictMode: true,
   serverExternalPackages: ["sharp", "exceljs"],
